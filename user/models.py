@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from util.models import get_ext_id
 from office.models import Office
+from .manager import UserManager
 
 
 # Create your models here.
@@ -13,7 +14,7 @@ class User(AbstractUser):
     display_name = models.CharField(max_length=50, unique=True)
     phone_no = models.CharField(max_length=10, unique=True)
     can_play = models.BooleanField(default=True)
-    office = models.ForeignKey(Office, related_name='employees', on_delete=models.CASCADE)
+    office = models.ForeignKey(Office, related_name='employees', on_delete=models.CASCADE, null=True)
     office_admin = models.BooleanField(default=False)
     super_admin = models.BooleanField(default=False)
     username = None
@@ -21,7 +22,7 @@ class User(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name', 'display_name']
 
-    # objects = UserManager()
+    objects = UserManager()
 
     def save(self, *args, **kwargs):
         while not self.ext_id:
