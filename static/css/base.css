@@ -3,6 +3,24 @@
     background-color: bisque
 }
 
+.header-container {
+    margin: 10px;
+    display: flex;
+    justify-content: space-between;
+}
+
 .header-title {
     font-size: 30px;
+}
+
+.header-info {
+    display: flex;
+}
+
+.messages {
+    margin-top: 20px;
+}
+
+.error {
+    color: red;
 }

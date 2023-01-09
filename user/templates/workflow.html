@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block basecss %}
+{{block.super}}
+<link href="{% static 'css/style.css' %}" rel="stylesheet">
+{% endblock basecss %}
+
+{% block content %}
+
+<div class="p-3">
+    <div class="workflow-heading">User Options</div>
+    {% if user.is_superuser %}
+    <div><a href="{% url 'admin_registration' %}">Create Office Administrator</a></div>
+    <div><a href="{% url 'admin_list' %}">Office Administrator List</a></div>
+    {% endif %}
+
+    <div>
+        <div><a href="{% url 'user_registration' %}">Create User</a></div>
+        <div><a href="{% url 'user_list' %}">User List</a></div>
+    </div>
+</div>
+<div class="p-3">
+    <div class="workflow-heading">Game Options</div>
+    <div>Create Tournament</div>
+    <div>Add Matches</div>
+</div>
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+        {% endfor %}
+</ul>
+{% endif %}
+{% endblock %}

@@ -13,3 +13,6 @@ class Office(models.Model):
             if not type(self).objects.filter(ext_id=new_id).exists():
                 self.ext_id = new_id
         super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
