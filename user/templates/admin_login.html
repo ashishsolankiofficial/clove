@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block basecss %}
+{{block.super}}
+<link href="{% static 'css/style.css' %}" rel="stylesheet">
+{% endblock basecss %}
+
+{% block content %}
+<div class="mt-5 login-container">
+    <h4>Office Administrator Login</h4>
+    <form method="POST" class="post-form" novalidate>{% csrf_token %}
+        <table>
+            {{ form.as_table }}
+        </table>
+        <button type="submit" class="save btn btn-secondary mt-3">Login</button>
+    </form>
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+            {% endfor %}
+    </ul>
+    {% endif %}
+</div>
+{% endblock %}
