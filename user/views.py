@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from user.forms import AdminForm, UserForm
 from user.models import User
+from office.models import Office
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
@@ -21,7 +22,10 @@ def admin_registration(request, ext_id=None):
         else:
             fm = AdminForm(request.POST)
         if fm.is_valid():
-            user = fm.save()
+            user = fm.save(commit=False)
+            user.set_password('admin')
+            user.office_admin = True
+            user.save()
             return redirect("admin_list")
     else:
         if ext_id:
@@ -32,7 +36,7 @@ def admin_registration(request, ext_id=None):
 
 
 def admin_list(request):
-    admins = User.objects.filter(office_admin=True).all().values("ext_id", "first_name", "last_name", "office__name")
+    admins = User.objects.filter(office_admin=True).all().values("ext_id", "display_name", "first_name", "last_name", "office__name")
     admin_list = {
         'admin_list': admins
     }
@@ -50,7 +54,10 @@ def user_registration(request, ext_id=None):
         else:
             fm = UserForm(request.POST)
         if fm.is_valid():
-            user = fm.save()
+            user = fm.save(commit=False)
+            user.office = Office.objects.get(name=request.user.office)
+            user.set_password('admin')
+            user.save()
             return redirect("user_list")
     else:
         if ext_id:
@@ -61,7 +68,7 @@ def user_registration(request, ext_id=None):
 
 
 def user_list(request):
-    users = User.objects.filter(office__name=request.user.office).all().values("ext_id", "first_name", "last_name")
+    users = User.objects.filter(office__name=request.user.office).all().values("ext_id", "display_name", "first_name", "last_name")
     user_list = {
         'user_list': users
     }

@@ -11,12 +11,12 @@
     <a href="{% url 'workflow' %}">Back</a>
 </div>
 <div class="mt-5 login-container">
-    <h4>Office Administrator List</h4>
+    <h4>Office User List</h4>
     <table class="table table-striped">
         <thead>
             <tr>
+                <th>Display Name</th>
                 <th>Name</th>
-                <th>Office</th>
                 <th>Edit</th>
             </tr>
         </thead>
@@ -24,8 +24,8 @@
             {% if user_list %}
             {% for i in user_list %}
             <tr>
+                <td>{{i.display_name}}</td>
                 <td>{{i.first_name}} {{i.last_name}}</td>
-                <td>{{i.office__name}}</td>
                 <td><a href="{% url 'user_edit' i.ext_id %}">Edit</a></td>
             </tr>
             {% endfor %}
