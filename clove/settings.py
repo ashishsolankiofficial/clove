@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'user',
     'office',
     'util',
+    'playable',
+    'team',
 ]
 
 MIDDLEWARE = [

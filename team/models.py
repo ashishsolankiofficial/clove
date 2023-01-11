@@ -1,12 +1,22 @@
 from django.db import models
-from playable.models import Sport
-from util.models import get_ext_id
+from util.models import Country, get_ext_id
+from user.models import User
 
 
 class Team(models.Model):
+
+    TYPE_CHOICES = (
+        ("N", "National"),
+        ("C", "Club"),
+    )
+    type = models.CharField(max_length=1,
+                            choices=TYPE_CHOICES,
+                            default="C")
     ext_id = models.CharField(max_length=10)
+    active = models.BooleanField(default=True)
     name = models.CharField(max_length=100, unique=True)
-    sport = models.ForeignKey(Sport, related_name='tournament', on_delete=models.CASCADE)
+    country = models.ForeignKey(Country, related_name='team', on_delete=models.CASCADE)
+    created_by = models.ForeignKey(User, related_name='bilateralmatch', on_delete=models.CASCADE, null=True)
 
     def save(self, *args, **kwargs):
         while not self.ext_id:

@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block basecss %}
+{{block.super}}
+<link href="{% static 'css/style.css' %}" rel="stylesheet">
+{% endblock basecss %}
+
+{% block content %}
+<div class="row mt-3">
+    <a href="{% url 'workflow' %}">Back</a>
+</div>
+<div class="mt-5 login-container">
+    <h4>Tournament List</h4>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Sport</th>
+                <th>Created By</th>
+                <th>Active</th>
+                <th>Edit</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if tournament_list %}
+            {% for i in tournament_list %}
+            <tr>
+                <td>{{i.name}}</td>
+                <td>{{i.sport__name}} </td>
+                <td>{{i.created_by__display_name}}</td>
+                <td>{{i.active}}</td>
+                <td><a href="{% url 'edit_tournament' i.ext_id %}">Edit</a></td>
+            </tr>
+            {% endfor %}
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
