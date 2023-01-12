@@ -17,4 +17,4 @@ class BilateralMatchAdmin(admin.ModelAdmin):
 
 admin.site.register(Sport, SportAdmin)
 admin.site.register(Tournament, TournamentAdmin)
-# # admin.site.register(BilateralMatch, BilateralMatchAdmin)
+admin.site.register(BilateralMatch, BilateralMatchAdmin)

@@ -33,17 +33,20 @@ class Tournament(models.Model):
                 self.ext_id = new_id
         super().save(*args, **kwargs)
 
+    def __str__(self):
+        return self.name
 
-class BilateralMatch(models.Manager):
+
+class BilateralMatch(models.Model):
     ext_id = models.CharField(max_length=10)
     name = models.CharField(max_length=100, unique=True)
     active = models.BooleanField(default=True)
-    created_by = models.ForeignKey(User, related_name='bilateralmatch', on_delete=models.CASCADE, null=True)
-    teamA = models.ForeignKey(Team, related_name='bilateralmatch', on_delete=models.CASCADE)
-    teamB = models.ForeignKey(Team, related_name='bilateralmatch', on_delete=models.CASCADE)
-    winner = models.ForeignKey(Team, related_name='bilateralmatch', on_delete=models.CASCADE, null=True)
+    created_by = models.ForeignKey(User, related_name='bilateralmatches', on_delete=models.CASCADE, null=True)
+    teamA = models.ForeignKey(Team, related_name='ateam_matches', on_delete=models.CASCADE)
+    teamB = models.ForeignKey(Team, related_name='bteam_matches', on_delete=models.CASCADE)
+    winner = models.ForeignKey(Team, related_name='won_matches', on_delete=models.CASCADE, null=True)
     match_start_time = models.DateTimeField(blank=False, null=False)
-    tournament = models.ForeignKey(Tournament, related_name='bilateralmatch', on_delete=models.CASCADE)
+    tournament = models.ForeignKey(Tournament, related_name='tournament_matches', on_delete=models.CASCADE)
 
     def save(self, *args, **kwargs):
         while not self.ext_id:
@@ -51,3 +54,6 @@ class BilateralMatch(models.Manager):
             if not type(self).objects.filter(ext_id=new_id).exists():
                 self.ext_id = new_id
         super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name

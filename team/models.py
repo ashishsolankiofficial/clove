@@ -18,6 +18,9 @@ class Team(models.Model):
     country = models.ForeignKey(Country, related_name='team', on_delete=models.CASCADE)
     created_by = models.ForeignKey(User, related_name='bilateralmatch', on_delete=models.CASCADE, null=True)
 
+    def __str__(self):
+        return self.name
+
     def save(self, *args, **kwargs):
         while not self.ext_id:
             new_id = get_ext_id()
