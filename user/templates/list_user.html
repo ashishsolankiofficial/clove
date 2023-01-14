@@ -29,7 +29,7 @@
             <tr>
                 <td>{{i.display_name}}</td>
                 <td>{{i.first_name}} {{i.last_name}}</td>
-                <td><a href="{% url 'user_edit' i.ext_id %}">Edit</a></td>
+                <td><a href="{% url 'edit_user' i.ext_id %}">Edit</a></td>
             </tr>
             {% endfor %}
             {% endif %}
