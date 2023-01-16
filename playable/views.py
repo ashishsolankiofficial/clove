@@ -47,7 +47,6 @@ def add_match(request, t_id):
             match = fm.save(commit=False)
             match.created_by = User.objects.get(ext_id=request.user.ext_id)
             match.tournament = Tournament.objects.get(ext_id=t_id)
-            match.match_start_time = datetime.strptime(match.match_start_time.strftime('%Y-%m-%d %H:%M:%S'), '%Y-%d-%m %H:%M:%S')
             match.save()
             return redirect("list_match", t_id)
     else:
@@ -63,7 +62,6 @@ def edit_match(request, t_id, ext_id):
             match = fm.save(commit=False)
             match.created_by = User.objects.get(ext_id=request.user.ext_id)
             match.tournament = Tournament.objects.get(ext_id=t_id)
-            match.match_start_time = datetime.strptime(match.match_start_time.strftime('%Y-%m-%d %H:%M:%S'), '%Y-%d-%m %H:%M:%S')
             match.save()
             return redirect("list_match", t_id)
     else:
