@@ -13,27 +13,20 @@
     <div class="workflow-heading">User Options</div>
     {% if user.is_superuser %}
     <div class="row mt-2">
-
+        <div class="col-md-4"><a href="{% url 'list_admin' %}">List Admins</a></div>
     </div>
     {% endif %}
     <div class="row mt-2">
-        <div class="col-md-4"><a href="{% url 'user_registration' %}">Create User</a></div>
-        <div class="col-md-4"><a href="{% url 'user_list' %}">List Users</a></div>
+        <div class="col-md-4"><a href="{% url 'list_user' %}">List Users</a></div>
     </div>
 </div>
 <div class="p-3">
     <div class="workflow-heading">Game Options</div>
     <div class="row mt-2">
-        <div class="col-md-4">Add Teams</div>
-        <div class="col-md-4">List Teams</div>
+        <div class="col-md-4"><a href="{% url 'list_team' %}">List Teams</a></div>
     </div>
     <div class="row mt-2">
-        <div class="col-md-4">Add Tournament</div>
-        <div class="col-md-4">List Tournaments</div>
-    </div>
-    <div class="row mt-2">
-        <div class="col-md-4">Add Match</div>
-        <div class="col-md-4">List Matchs</div>
+        <div class="col-md-4"><a href="{% url 'list_tournament' %}">List Tournaments</a></div>
     </div>
 </div>
 

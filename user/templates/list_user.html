@@ -12,6 +12,9 @@
 </div>
 <div class="mt-5 login-container">
     <h4>Office User List</h4>
+    <div class="mt-3 mb-3">
+        <div class="col-md-4"><a href="{% url 'add_user' %}">Create User</a></div>
+    </div>
     <table class="table table-striped">
         <thead>
             <tr>
@@ -26,7 +29,7 @@
             <tr>
                 <td>{{i.display_name}}</td>
                 <td>{{i.first_name}} {{i.last_name}}</td>
-                <td><a href="{% url 'user_edit' i.ext_id %}">Edit</a></td>
+                <td><a href="{% url 'edit_user' i.ext_id %}">Edit</a></td>
             </tr>
             {% endfor %}
             {% endif %}

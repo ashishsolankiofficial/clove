@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from user.forms import AdminForm, UserForm
 from user.models import User
+from payable.models import PayableProfile
 from office.models import Office
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate, login, logout
@@ -11,68 +12,79 @@ def show_workflow(request):
     return render(request, 'workflow.html', {'user': request.user})
 
 
-def admin_registration(request, ext_id=None):
-    try:
-        user_profile = User.objects.get(ext_id=ext_id)
-    except:
-        pass
+def add_admin(request, ext_id=None):
     if request.method == 'POST':
-        if ext_id:
-            fm = AdminForm(request.POST or None, instance=user_profile)
-        else:
-            fm = AdminForm(request.POST)
+        fm = AdminForm(request.POST)
         if fm.is_valid():
             user = fm.save(commit=False)
             user.set_password('admin')
             user.office_admin = True
             user.save()
-            return redirect("admin_list")
+            return redirect("list_admin")
     else:
-        if ext_id:
-            fm = AdminForm(instance=user_profile)
-        else:
-            fm = AdminForm()
-    return render(request, 'admin_registration.html', {'form': fm})
+        fm = AdminForm()
+    return render(request, 'add_admin.html', {'form': fm})
 
 
-def admin_list(request):
+def edit_admin(request, ext_id):
+    user_profile = get_object_or_404(User, ext_id=ext_id)
+    if request.method == 'POST':
+        fm = AdminForm(request.POST, instance=user_profile)
+        if fm.is_valid():
+            user = fm.save(commit=False)
+            user.set_password('admin')
+            user.office_admin = True
+            user.save()
+            return redirect("list_admin")
+    else:
+        fm = AdminForm(instance=user_profile)
+    return render(request, 'add_admin.html', {'form': fm})
+
+
+def list_admin(request):
     admins = User.objects.filter(office_admin=True).all().values("ext_id", "display_name", "first_name", "last_name", "office__name")
     admin_list = {
         'admin_list': admins
     }
-    return render(request, 'admin_list.html', admin_list)
+    return render(request, 'list_admin.html', admin_list)
 
 
-def user_registration(request, ext_id=None):
-    try:
-        user_profile = User.objects.get(ext_id=ext_id)
-    except:
-        pass
+def add_user(request):
     if request.method == 'POST':
-        if ext_id:
-            fm = UserForm(request.POST or None, instance=user_profile)
-        else:
-            fm = UserForm(request.POST)
+        fm = UserForm(request.POST)
         if fm.is_valid():
             user = fm.save(commit=False)
             user.office = Office.objects.get(name=request.user.office)
             user.set_password('admin')
             user.save()
-            return redirect("user_list")
+            PayableProfile.objects.create(user=user)
+            return redirect("list_user")
     else:
-        if ext_id:
-            fm = UserForm(instance=user_profile)
-        else:
-            fm = UserForm()
-    return render(request, 'user_registration.html', {'form': fm})
+        fm = UserForm()
+    return render(request, 'add_user.html', {'form': fm})
 
 
-def user_list(request):
+def edit_user(request, ext_id):
+    user_profile = get_object_or_404(User, ext_id=ext_id)
+    if request.method == 'POST':
+        fm = UserForm(request.POST, instance=user_profile)
+        if fm.is_valid():
+            user = fm.save(commit=False)
+            user.office = Office.objects.get(name=request.user.office)
+            user.set_password('admin')
+            user.save()
+            return redirect("list_user")
+    else:
+        fm = UserForm(instance=user_profile)
+    return render(request, 'add_user.html', {'form': fm})
+
+
+def list_user(request):
     users = User.objects.filter(office__name=request.user.office).all().values("ext_id", "display_name", "first_name", "last_name")
     user_list = {
         'user_list': users
     }
-    return render(request, 'user_list.html', user_list)
+    return render(request, 'list_user.html', user_list)
 
 
 def login_admin(request):

@@ -11,24 +11,27 @@
     <a href="{% url 'workflow' %}">Back</a>
 </div>
 <div class="mt-5 login-container">
-    <h4>Office Administrator List</h4>
+    <h4>Team List</h4>
+    <div class="mt-3 mb-3"><a href="{% url 'add_team' %}">Add Teams</a></div>
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>Display Name</th>
                 <th>Name</th>
-                <th>Office</th>
+                <th>Country</th>
+                <th>Created By</th>
+                <th>Active</th>
                 <th>Edit</th>
             </tr>
         </thead>
         <tbody>
-            {% if admin_list %}
-            {% for i in admin_list %}
+            {% if team_list %}
+            {% for i in team_list %}
             <tr>
-                <td>{{i.display_name}}</td>
-                <td>{{i.first_name}} {{i.last_name}}</td>
-                <td>{{i.office__name}}</td>
-                <td><a href="{% url 'admin_edit' i.ext_id %}">Edit</a></td>
+                <td>{{i.name}}</td>
+                <td>{{i.country__name}} </td>
+                <td>{{i.created_by__display_name}}</td>
+                <td>{{i.active}}</td>
+                <td><a href="{% url 'edit_team' i.ext_id %}">Edit</a></td>
             </tr>
             {% endfor %}
             {% endif %}
