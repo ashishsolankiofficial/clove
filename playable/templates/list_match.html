@@ -36,7 +36,11 @@
                 <td>{{i.created_by__display_name}}</td>
                 <td>{{i.teamA__name}}</td>
                 <td>{{i.teamB__name}}</td>
+                {% if i.winner__name %}
                 <td>{{i.winner__name}}</td>
+                {% else %}
+                <td><a href="{% url 'settle_bilateral' tournament.ext_id i.ext_id %}">Choose</a></td>
+                {% endif%}
                 <td><a href="{% url 'edit_match' tournament.ext_id i.ext_id %}">Edit</a></td>
             </tr>
             {% endfor %}

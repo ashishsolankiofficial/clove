@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from playable.forms import TournamentForm, BilateralMatchForm
+from playable.forms import TournamentForm, BilateralMatchForm, BilateralMatchWinnerForm
 from playable.models import Tournament, BilateralMatch
 from user.models import User
 from datetime import datetime
@@ -77,3 +77,10 @@ def list_match(request, t_id):
         'match_list': matches
     }
     return render(request, 'list_match.html', match_list)
+
+
+def settle_bilateral(request, t_id, ext_id):
+    # tournament = Tournament.objects.get(ext_id=t_id)
+    match = get_object_or_404(BilateralMatch, ext_id=ext_id)
+    fm = BilateralMatchWinnerForm(teams=[match.teamA.ext_id, match.teamB.ext_id])
+    return render(request, 'settle_bilateral.html', {'form': fm, 'tournament_id': t_id})

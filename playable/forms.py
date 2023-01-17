@@ -1,6 +1,6 @@
 from django import forms
 from playable.models import Tournament, BilateralMatch
-from django.contrib.admin.widgets import AdminSplitDateTime
+from team.models import Team
 
 
 class DateTimePickerInput(forms.DateTimeInput):
@@ -26,3 +26,13 @@ class BilateralMatchForm(forms.ModelForm):
         widgets = {
             'match_start_time': DateTimeInput()
         }
+
+
+class BilateralMatchWinnerForm(forms.ModelForm):
+    class Meta:
+        model = BilateralMatch
+        fields = ['winner', ]
+
+    def __init__(self, teams, *args, **kwargs):
+        super(BilateralMatchWinnerForm, self).__init__(*args, **kwargs)  # populates the post
+        self.fields['winner'].queryset = Team.objects.filter(ext_id__in=teams)

@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'util',
     'playable',
     'team',
+    'payable',
 ]
 
 MIDDLEWARE = [

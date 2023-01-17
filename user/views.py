@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from user.forms import AdminForm, UserForm
 from user.models import User
+from payable.models import PayableProfile
 from office.models import Office
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate, login, logout
@@ -56,6 +57,7 @@ def add_user(request):
             user.office = Office.objects.get(name=request.user.office)
             user.set_password('admin')
             user.save()
+            PayableProfile.objects.create(user=user)
             return redirect("list_user")
     else:
         fm = UserForm()
