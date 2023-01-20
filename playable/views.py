@@ -1,8 +1,18 @@
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from django.shortcuts import render, redirect, get_object_or_404
 from playable.forms import TournamentForm, BilateralMatchForm, BilateralMatchWinnerForm
-from playable.models import Tournament, BilateralMatch
+from playable.models import Tournament, BilateralMatch, Sport
+from playable.serializer import SportSerializer
 from user.models import User
 from datetime import datetime
+
+
+class SportsView(APIView):
+    def get(self, request):
+        sports = Sport.objects.all()
+        serializer = SportSerializer(sports, many=True)
+        return Response(serializer.data)
 
 
 def add_tournament(request):
