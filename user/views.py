@@ -20,6 +20,7 @@ def add_admin(request, ext_id=None):
             user.set_password('admin')
             user.office_admin = True
             user.save()
+            PayableProfile.objects.create(user=user)
             return redirect("list_admin")
     else:
         fm = AdminForm()
