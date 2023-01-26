@@ -1,5 +1,6 @@
 from django.urls import path
 import playable.views as view
+from playable.views import UpcommingView, MatchView
 
 urlpatterns = [
     path('add_tournament/', view.add_tournament, name='add_tournament'),
@@ -9,4 +10,7 @@ urlpatterns = [
     path('edit_match/<str:t_id>/<str:ext_id>/', view.edit_match, name='edit_match'),
     path('list_match/<str:t_id>/', view.list_match, name='list_match'),
     path('settle_bilateral/<str:t_id>/<str:ext_id>/', view.settle_bilateral, name='settle_bilateral'),
+
+    path('upcomming/', UpcommingView.as_view()),
+    path('match/<str:ext_id>', MatchView.as_view())
 ]
