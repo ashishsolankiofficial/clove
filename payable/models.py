@@ -24,24 +24,11 @@ class PayableProfile(models.Model):
         return self.user.display_name
 
 
-class UnsettledBet(models.Model):
-    user = models.ForeignKey(User, related_name="ubets", on_delete=models.CASCADE)
-    team = models.ForeignKey(Team, related_name="team_bets", on_delete=models.CASCADE)
-    amount = models.IntegerField(default=0)
-
-
-class SettledBet(models.Model):
-    user = models.ForeignKey(User, related_name="sbets", on_delete=models.CASCADE)
-    amount = models.IntegerField(default=0)
-
-
 class BilateralBet(models.Model):
     match = models.ForeignKey(BilateralMatch, related_name='bet',  on_delete=models.CASCADE)
     ext_id = models.CharField(max_length=10)
     office = models.ForeignKey(Office, related_name='office_bets', on_delete=models.CASCADE)
     settled = models.BooleanField(default=False)
-    placed_bets = models.ManyToManyField(UnsettledBet, related_name="placed_bilateral_bet")
-    settled_bets = models.ManyToManyField(SettledBet, related_name="setelled_bilateral_bet")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -54,3 +41,16 @@ class BilateralBet(models.Model):
 
     def __str__(self):
         return self.match.name
+
+
+class UnsettledBet(models.Model):
+    user = models.ForeignKey(User, related_name="ubets", on_delete=models.CASCADE)
+    team = models.ForeignKey(Team, related_name="team_bets", on_delete=models.CASCADE)
+    bet = models.ForeignKey(BilateralBet, related_name="ubets", on_delete=models.CASCADE, null=True)
+    amount = models.IntegerField(default=0)
+
+
+class SettledBet(models.Model):
+    user = models.ForeignKey(User, related_name="sbets", on_delete=models.CASCADE)
+    amount = models.IntegerField(default=0)
+    bet = models.ForeignKey(BilateralBet, related_name="sbets", on_delete=models.CASCADE, null=True)

@@ -3,11 +3,12 @@ from rest_framework.response import Response
 from django.shortcuts import render, redirect, get_object_or_404
 from playable.forms import TournamentForm, BilateralMatchForm, BilateralMatchWinnerForm
 from playable.models import Tournament, BilateralMatch, Sport
+from payable.models import UnsettledBet, BilateralBet
 from user.models import User
 from datetime import datetime
 
 from playable.models import Sport, BilateralMatch
-from playable.serializer import UpcommingSerializer, MatchSerializer
+from playable.serializer import UpcommingSerializer, MatchSerializer, YourBetSerializer
 
 
 class UpcommingView(APIView):
@@ -19,8 +20,15 @@ class UpcommingView(APIView):
 
 class MatchView(APIView):
     def get(self, request, ext_id):
-        match = BilateralMatch.objects.last()
+        match = BilateralMatch.objects.get(ext_id=ext_id)
         serializer = MatchSerializer(match)
+        return Response(serializer.data)
+
+
+class MatchBetsView(APIView):
+    def get(self, request):
+        match = BilateralMatch.objects.filter(bet__ubets__user__ext_id=request.user.ext_id)
+        serializer = YourBetSerializer(match, many=True, context={'request': request})
         return Response(serializer.data)
 
 

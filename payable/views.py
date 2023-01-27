@@ -8,8 +8,8 @@ from django.shortcuts import get_object_or_404
 from playable.models import BilateralMatch
 from office.models import Office
 from user.models import User
-from payable.models import PayableProfile, BilateralBet
-from payable.serializer import CoinSerializer, BetSerializer
+from payable.models import PayableProfile, BilateralBet, UnsettledBet
+from payable.serializer import CoinSerializer, BetSerializer, UnsettledBetSerializer
 
 # Create your views here.
 
@@ -25,9 +25,9 @@ class BetList(APIView, PageNumberPagination):
     page_size = 20
 
     def get(self, request, format=None):
-        query_set = BilateralBet.objects.filter(placed_bets__user__ext_id=request.user.ext_id)
+        query_set = UnsettledBet.objects.filter(user__ext_id=request.user.ext_id)
         query_set = self.paginate_queryset(query_set, request, view=self)
-        serializer = BetSerializer(query_set, many=True)
+        serializer = UnsettledBetSerializer(query_set, many=True)
         return self.get_paginated_response(serializer.data)
 
     def post(self, request, format=None):
@@ -42,10 +42,7 @@ class BetList(APIView, PageNumberPagination):
 class BetView(APIView):
 
     def get(self, request, ext_id):
-        try:
-            bilateral_bet = BilateralBet.objects.get(match__ext_id=ext_id)
-        except:
-            return Response("No Previous Bets found", status=status.HTTP_204_NO_CONTENT)
+        bilateral_bet = BilateralBet.objects.get(ext_id=ext_id)
         serializer = BetSerializer(bilateral_bet)
         return Response(serializer.data)
 
