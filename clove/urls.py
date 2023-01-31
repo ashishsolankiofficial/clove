@@ -14,6 +14,7 @@ urlpatterns = [
     path('team/', include('team.urls')),
     path('playable/', include('playable.urls')),
     path('payable/', include('payable.urls')),
+    path('office/', include('office.urls')),
 
     path('auth/login/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('auth/token-refresh/', TokenRefreshView.as_view(), name='token_refresh'),
