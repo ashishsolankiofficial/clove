@@ -67,3 +67,11 @@ class BetSerializer(serializers.ModelSerializer):
         except:
             UnsettledBet.objects.create(bet=instance, user=user, team=team, amount=self.context.get('request').data['placed_bets'][0]['amount'])
         return instance
+
+
+class PayableProfileSerializer(serializers.ModelSerializer):
+    user_name = serializers.CharField(source='user.display_name')
+
+    class Meta:
+        model = PayableProfile
+        fields = ['user_name', 'coins']
