@@ -70,8 +70,8 @@ class BetSerializer(serializers.ModelSerializer):
 
 
 class PayableProfileSerializer(serializers.ModelSerializer):
-    user_name = serializers.CharField(source='user.display_name')
+    display_name = serializers.CharField(source='user.display_name')
 
     class Meta:
         model = PayableProfile
-        fields = ['user_name', 'coins']
+        fields = ['display_name', 'coins']

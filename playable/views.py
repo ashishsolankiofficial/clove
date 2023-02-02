@@ -68,23 +68,25 @@ def list_tournament(request):
 
 
 def add_match(request, t_id):
+    tournament = Tournament.objects.get(ext_id=t_id)
     if request.method == 'POST':
-        fm = BilateralMatchForm(request.POST)
+        fm = BilateralMatchForm(request.POST, tournament=tournament)
         if fm.is_valid():
             match = fm.save(commit=False)
             match.created_by = User.objects.get(ext_id=request.user.ext_id)
-            match.tournament = Tournament.objects.get(ext_id=t_id)
+            match.tournament = tournament
             match.save()
             return redirect("list_match", t_id)
     else:
-        fm = BilateralMatchForm()
+        fm = BilateralMatchForm(tournament=tournament)
     return render(request, 'add_match.html', {'form': fm, 'tournament_id': t_id})
 
 
 def edit_match(request, t_id, ext_id):
+    tournament = Tournament.objects.get(ext_id=t_id)
     match = get_object_or_404(BilateralMatch, ext_id=ext_id)
     if request.method == 'POST':
-        fm = BilateralMatchForm(request.POST, instance=match)
+        fm = BilateralMatchForm(request.POST, instance=match, tournament=tournament)
         if fm.is_valid():
             match = fm.save(commit=False)
             match.created_by = User.objects.get(ext_id=request.user.ext_id)
@@ -92,7 +94,7 @@ def edit_match(request, t_id, ext_id):
             match.save()
             return redirect("list_match", t_id)
     else:
-        fm = BilateralMatchForm(instance=match)
+        fm = BilateralMatchForm(instance=match, tournament=tournament)
     return render(request, 'add_match.html', {'form': fm, 'tournament_id': t_id})
 
 

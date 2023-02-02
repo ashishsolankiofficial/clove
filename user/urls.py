@@ -1,5 +1,6 @@
 from django.urls import path
 import user.views as view
+from user.views import UserProfileView
 
 urlpatterns = [
 
@@ -9,4 +10,6 @@ urlpatterns = [
     path('add_user/', view.add_user, name='add_user'),
     path('edit_user/<str:ext_id>/', view.edit_user, name='edit_user'),
     path('list_user/', view.list_user, name='list_user'),
+
+    path('profile/<str:ext_id>/', UserProfileView.as_view())
 ]
