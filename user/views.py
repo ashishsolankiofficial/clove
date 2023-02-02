@@ -1,11 +1,30 @@
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 from django.shortcuts import render, redirect, get_object_or_404
 from user.forms import AdminForm, UserForm
 from user.models import User
+from user.serializer import UserProfileSerializer
 from payable.models import PayableProfile
 from office.models import Office
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
+
+
+class UserProfileView(APIView):
+    def get(self, request, ext_id):
+        profile = User.objects.get(ext_id=ext_id)
+        serializer = UserProfileSerializer(profile)
+        return Response(serializer.data)
+
+    def put(self, request, ext_id, format=None):
+        profile = User.objects.get(ext_id=ext_id)
+        serializer = UserProfileSerializer(profile, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 def show_workflow(request):
@@ -97,6 +116,9 @@ def login_admin(request):
             username = fm.cleaned_data.get('username')
             password = fm.cleaned_data.get('password')
             user = authenticate(username=username, password=password)
+            if not (user.office_admin or user.is_superuser):
+                messages.error(request, "Portal is only for OfficeJAM Administrators")
+                return redirect("admin_login")
             if user is not None:
                 login(request, user)
                 return redirect("workflow")
