@@ -109,7 +109,6 @@ def list_match(request, t_id):
 
 
 def settle_bilateral(request, t_id, ext_id):
-    # tournament = Tournament.objects.get(ext_id=t_id)
     match = get_object_or_404(BilateralMatch, ext_id=ext_id)
     fm = BilateralMatchWinnerForm(teams=[match.teamA.ext_id, match.teamB.ext_id])
     return render(request, 'settle_bilateral.html', {'form': fm, 'tournament_id': t_id})

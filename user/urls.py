@@ -1,15 +1,17 @@
 from django.urls import path
-import user.views as view
-from user.views import UserProfileView
+import user.views as views
+from user.views import UserProfileView, ResetPassword
 
 urlpatterns = [
 
-    path('add_admin/', view.add_admin, name='add_admin'),
-    path('edit_admin/<str:ext_id>/', view.edit_admin, name='edit_admin'),
-    path('list_admin/', view.list_admin, name='list_admin'),
-    path('add_user/', view.add_user, name='add_user'),
-    path('edit_user/<str:ext_id>/', view.edit_user, name='edit_user'),
-    path('list_user/', view.list_user, name='list_user'),
+    path('add_admin/', views.add_admin, name='add_admin'),
+    path('edit_admin/<str:ext_id>/', views.edit_admin, name='edit_admin'),
+    path('list_admin/', views.list_admin, name='list_admin'),
+    path('add_user/', views.add_user, name='add_user'),
+    path('edit_user/<str:ext_id>/', views.edit_user, name='edit_user'),
+    path('list_user/', views.list_user, name='list_user'),
+
+    path('reset-password/', ResetPassword.as_view()),
 
     path('profile/<str:ext_id>/', UserProfileView.as_view())
 ]
