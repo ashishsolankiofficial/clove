@@ -27,6 +27,23 @@ class UserProfileView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class ResetPassword(APIView):
+    def post(self, request):
+        username = request.user.email
+        old_password = request.data['old_password']
+        password = request.data['password']
+        password2 = request.data['password2']
+        if password != password2:
+            return Response('New Passwords Do not Match', status=status.HTTP_400_BAD_REQUEST)
+        user = authenticate(username=username, password=old_password)
+        if user is not None:
+            user.set_password(password)
+            user.save()
+            return Response('Password updated successfully', status.HTTP_200_OK)
+        else:
+            return Response('Invalid Old Password', status=status.HTTP_400_BAD_REQUEST)
+
+
 def show_workflow(request):
     return render(request, 'workflow.html', {'user': request.user})
 
