@@ -3,9 +3,10 @@ from rest_framework.response import Response
 from django.shortcuts import render, redirect, get_object_or_404
 from playable.forms import TournamentForm, BilateralMatchForm, BilateralMatchWinnerForm
 from playable.models import Tournament, BilateralMatch, Sport
-from payable.models import UnsettledBet, BilateralBet
+from payable.models import SettledBet, PayableProfile
 from user.models import User
 from datetime import datetime
+from django.db.models import Sum
 
 from playable.models import Sport, BilateralMatch
 from playable.serializer import UpcommingSerializer, MatchSerializer, YourBetSerializer
@@ -13,7 +14,7 @@ from playable.serializer import UpcommingSerializer, MatchSerializer, YourBetSer
 
 class UpcommingView(APIView):
     def get(self, request):
-        sports = Sport.objects.all()
+        sports = Sport.objects.filter(tournament__tournament_matches__active=True).distinct()
         serializer = UpcommingSerializer(sports, many=True)
         return Response(serializer.data)
 
@@ -25,7 +26,7 @@ class MatchView(APIView):
         return Response(serializer.data)
 
 
-class MatchBetsView(APIView):
+class YourBetsView(APIView):
     def get(self, request):
         match = BilateralMatch.objects.filter(bet__ubets__user__ext_id=request.user.ext_id)
         serializer = YourBetSerializer(match, many=True, context={'request': request})
@@ -60,17 +61,25 @@ def edit_tournament(request, ext_id):
 
 
 def list_tournament(request):
-    tournaments = Tournament.objects.all().values('ext_id', 'name', 'sport__name', 'created_by__display_name', 'active')
+    tournaments = Tournament.objects.filter(active=True).values('ext_id', 'name', 'sport__name', 'created_by__display_name', 'active')
     tournament_list = {
         'tournament_list': tournaments
     }
     return render(request, 'list_tournament.html', tournament_list)
 
 
+def list_inactive_tournament(request):
+    tournaments = Tournament.objects.filter(active=False).values('ext_id', 'name', 'sport__name', 'created_by__display_name', 'active')
+    tournament_list = {
+        'tournament_list': tournaments
+    }
+    return render(request, 'list_inactive_tournament.html', tournament_list)
+
+
 def add_match(request, t_id):
     tournament = Tournament.objects.get(ext_id=t_id)
     if request.method == 'POST':
-        fm = BilateralMatchForm(request.POST, tournament=tournament)
+        fm = BilateralMatchForm(data=request.POST)
         if fm.is_valid():
             match = fm.save(commit=False)
             match.created_by = User.objects.get(ext_id=request.user.ext_id)
@@ -86,7 +95,7 @@ def edit_match(request, t_id, ext_id):
     tournament = Tournament.objects.get(ext_id=t_id)
     match = get_object_or_404(BilateralMatch, ext_id=ext_id)
     if request.method == 'POST':
-        fm = BilateralMatchForm(request.POST, instance=match, tournament=tournament)
+        fm = BilateralMatchForm(data=request.POST, instance=match, tournament=tournament)
         if fm.is_valid():
             match = fm.save(commit=False)
             match.created_by = User.objects.get(ext_id=request.user.ext_id)
@@ -100,7 +109,8 @@ def edit_match(request, t_id, ext_id):
 
 def list_match(request, t_id):
     tournament = Tournament.objects.get(ext_id=t_id)
-    matches = BilateralMatch.objects.filter(tournament__ext_id=t_id).values('ext_id', 'name', 'match_start_time', 'active', 'teamA__name', 'teamB__name', 'winner', 'created_by__display_name')
+    matches = BilateralMatch.objects.filter(tournament__ext_id=t_id, active=True).values('ext_id', 'name', 'match_start_time',
+                                                                                         'active', 'teamA__name', 'teamB__name', 'winner__name', 'created_by__display_name')
     match_list = {
         'tournament': tournament,
         'match_list': matches
@@ -108,7 +118,72 @@ def list_match(request, t_id):
     return render(request, 'list_match.html', match_list)
 
 
+def list_inactive_match(request, t_id):
+    tournament = Tournament.objects.get(ext_id=t_id)
+    matches = BilateralMatch.objects.filter(tournament__ext_id=t_id, active=False).values('ext_id', 'name', 'match_start_time',
+                                                                                          'active', 'teamA__name', 'teamB__name', 'winner__name', 'created_by__display_name')
+    match_list = {
+        'tournament': tournament,
+        'match_list': matches
+    }
+    return render(request, 'list_inactive_match.html', match_list)
+
+
 def settle_bilateral(request, t_id, ext_id):
     match = get_object_or_404(BilateralMatch, ext_id=ext_id)
-    fm = BilateralMatchWinnerForm(teams=[match.teamA.ext_id, match.teamB.ext_id])
+    user = User.objects.get(ext_id=request.user.ext_id)
+    if request.method == 'POST':
+        office_bet = match.bet.filter(office__ext_id=user.office.ext_id).first()
+        if office_bet:
+            ubets = office_bet.ubets.all()
+            team_a_ubets = ubets.filter(team__ext_id=match.teamA.ext_id)
+            team_b_ubets = ubets.filter(team__ext_id=match.teamB.ext_id)
+            team_a_total = 0
+            team_b_total = 0
+            if team_a_ubets:
+                team_a_total = team_a_ubets.aggregate(Sum('amount'))['amount__sum']
+            if team_b_ubets:
+                team_b_total = team_b_ubets.aggregate(Sum('amount'))['amount__sum']
+        if match.teamA.id == int(request.POST['winner']):
+            if office_bet:
+                for ubet in team_a_ubets:
+                    win_amount = ubet.amount + (team_b_total * ubet.amount/team_a_total)
+                    sbet = SettledBet.objects.create(bet=office_bet, user=ubet.user, amount=win_amount)
+                    user_profile = PayableProfile.objects.get(user=ubet.user)
+                    user_profile.coins = user_profile.coins + sbet.amount
+                    user_profile.save()
+                if not team_a_ubets:
+                    for ubet in team_b_ubets:
+                        refund_amount = ubet.amount
+                        sbet = SettledBet.objects.create(bet=office_bet, user=ubet.user, amount=refund_amount)
+                        user_profile = PayableProfile.objects.get(user=ubet.user)
+                        user_profile.coins = user_profile.coins + refund_amount
+                        user_profile.save()
+            match.winner = match.teamA
+            match.active = False
+            match.save()
+        if match.teamB.id == int(request.POST['winner']):
+            if office_bet:
+                for ubet in team_b_ubets:
+                    win_amount = ubet.amount + (team_a_total * ubet.amount/team_b_total)
+                    sbet = SettledBet.objects.create(bet=office_bet, user=ubet.user, amount=win_amount)
+                    user_profile = PayableProfile.objects.get(user=ubet.user)
+                    user_profile.coins = user_profile.coins + sbet.amount
+                    user_profile.save()
+                if not team_b_ubets:
+                    for ubet in team_a_ubets:
+                        refund_amount = ubet.amount
+                        sbet = SettledBet.objects.create(bet=office_bet, user=ubet.user, amount=refund_amount)
+                        user_profile = PayableProfile.objects.get(user=ubet.user)
+                        user_profile.coins = user_profile.coins + refund_amount
+                        user_profile.save()
+            match.winner = match.teamB
+            match.active = False
+            match.save()
+        if office_bet:
+            office_bet.settled = True
+            office_bet.save()
+        return redirect("list_match", t_id)
+    else:
+        fm = BilateralMatchWinnerForm(teams=[match.teamA.ext_id, match.teamB.ext_id])
     return render(request, 'settle_bilateral.html', {'form': fm, 'tournament_id': t_id})

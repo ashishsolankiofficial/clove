@@ -26,10 +26,11 @@ class BilateralMatchForm(forms.ModelForm):
             'match_start_time': DateTimeInput()
         }
 
-    def __init__(self, tournament, *args, **kwargs):
+    def __init__(self, tournament=None, *args, **kwargs):
         super(BilateralMatchForm, self).__init__(*args, **kwargs)
-        self.fields['teamA'].queryset = Team.objects.filter(sport=tournament.sport)
-        self.fields['teamB'].queryset = Team.objects.filter(sport=tournament.sport)
+        if tournament:
+            self.fields['teamA'].queryset = Team.objects.filter(sport=tournament.sport)
+            self.fields['teamB'].queryset = Team.objects.filter(sport=tournament.sport)
 
 
 class BilateralMatchWinnerForm(forms.ModelForm):

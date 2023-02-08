@@ -15,7 +15,7 @@ class Team(models.Model):
     ext_id = models.CharField(max_length=10)
     active = models.BooleanField(default=True)
     image_url = models.URLField(blank=True, null=True)
-    name = models.CharField(max_length=100, unique=True)
+    name = models.CharField(max_length=100)
     country = models.ForeignKey(Country, related_name='team', on_delete=models.CASCADE)
     sport = models.ForeignKey("playable.Sport", related_name="teams", on_delete=models.CASCADE, null=True)
     created_by = models.ForeignKey(User, related_name='bilateralmatch', on_delete=models.CASCADE, null=True)

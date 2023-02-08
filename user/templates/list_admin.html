@@ -19,6 +19,7 @@
                 <th>Display Name</th>
                 <th>Name</th>
                 <th>Office</th>
+                <th>Email</th>
                 <th>Edit</th>
             </tr>
         </thead>
@@ -29,6 +30,7 @@
                 <td>{{i.display_name}}</td>
                 <td>{{i.first_name}} {{i.last_name}}</td>
                 <td>{{i.office__name}}</td>
+                <td>{{i.email}}</td>
                 <td><a href="{% url 'edit_admin' i.ext_id %}">Edit</a></td>
             </tr>
             {% endfor %}

@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
-from payable.models import PayableProfile, BilateralBet, UnsettledBet
+from payable.models import PayableProfile, OfficeBet, UnsettledBet
 from office.models import Office
 from playable.models import BilateralMatch
 from user.models import User
@@ -42,7 +42,7 @@ class BetSerializer(serializers.ModelSerializer):
     placed_bets = serializers.SerializerMethodField()
 
     class Meta:
-        model = BilateralBet
+        model = OfficeBet
         fields = ['ext_id', 'match', 'office', 'settled', 'placed_bets']
         read_only_fields = ['ext_id']
 
@@ -52,8 +52,11 @@ class BetSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = User.objects.get(ext_id=self.context.get('request').user.ext_id)
         team = Team.objects.get(ext_id=self.context.get('request').data['placed_bets'][0]['team'])
-        instance = BilateralBet.objects.create(**validated_data)
-        UnsettledBet.objects.create(bet=instance, user=user, team=team, amount=self.context.get('request').data['placed_bets'][0]['amount'])
+        instance = OfficeBet.objects.create(**validated_data)
+        ubet = UnsettledBet.objects.create(bet=instance, user=user, team=team, amount=self.context.get('request').data['placed_bets'][0]['amount'])
+        user_profile = PayableProfile.objects.get(user=user)
+        user_profile.coins = user_profile.coins - ubet.amount
+        user_profile.save()
         return instance
 
     def update(self, instance, validated_data):
@@ -62,10 +65,17 @@ class BetSerializer(serializers.ModelSerializer):
         try:
             ubet = instance.ubets.get(user=user)
             ubet.team = team
+            previous_bet_amount = ubet.amount
             ubet.amount = self.context.get('request').data['placed_bets'][0]['amount']
             ubet.save()
+            user_profile = PayableProfile.objects.get(user=user)
+            user_profile.coins = user_profile.coins - (ubet.amount - previous_bet_amount)
+            user_profile.save()
         except:
-            UnsettledBet.objects.create(bet=instance, user=user, team=team, amount=self.context.get('request').data['placed_bets'][0]['amount'])
+            ubet = UnsettledBet.objects.create(bet=instance, user=user, team=team, amount=self.context.get('request').data['placed_bets'][0]['amount'])
+            user_profile = PayableProfile.objects.get(user=user)
+            user_profile.coins = user_profile.coins - ubet.amount
+            user_profile.save()
         return instance
 
 

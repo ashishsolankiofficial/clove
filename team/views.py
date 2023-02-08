@@ -32,7 +32,7 @@ def edit_team(request, ext_id):
 
 
 def list_team(request):
-    teams = Team.objects.all().values('ext_id', 'type', 'name', 'country__name', 'created_by__display_name', 'active')
+    teams = Team.objects.all().values('ext_id', 'type', 'name', 'country__name', 'created_by__display_name', 'sport__name', 'active')
     team_list = {
         'team_list': teams
     }
