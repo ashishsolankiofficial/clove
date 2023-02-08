@@ -13,7 +13,7 @@
     <a href="{% url 'list_match' tournament_id %}">Back</a>
 </div>
 <div class="mt-4 login-container">
-    <h4>Settle Match</h4>
+    <h4>Choose Winner</h4>
     <form method="POST" class="post-form" novalidate>{% csrf_token %}
         {{form.as_p}}
         <button type="submit" class="save btn btn-secondary mt-3">Save</button>

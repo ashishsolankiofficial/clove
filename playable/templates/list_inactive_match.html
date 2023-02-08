@@ -8,11 +8,10 @@
 
 {% block content %}
 <div class="row mt-3">
-    <a href="{% url 'list_tournament' %}">Back</a>
+    <a href="{% url 'list_match' tournament.ext_id %}">Back</a>
 </div>
 <div class="mt-4 login-container">
-    <h4>Active Match List : {{tournament.name}}</h4>
-    <div class="mt-4 mb-4"><a href="{% url 'add_match' tournament.ext_id %}">Add Match</a></div>
+    <h4>In-Active Match List : {{tournament.name}}</h4>
     {% if match_list %}
     <table class="table table-striped">
         <thead>
@@ -47,8 +46,7 @@
         </tbody>
     </table>
     {% else %}
-    <div>No Active Matches Found</div>
+    <div>No In-Active Matches Found</div>
     {% endif %}
 </div>
-<div class="mt-5"><a href="{% url 'list_inactive_match' tournament.ext_id %}">List Inactive Matches</a></div>
 {% endblock %}

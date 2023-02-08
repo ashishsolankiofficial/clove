@@ -24,7 +24,7 @@ class PayableProfile(models.Model):
         return self.user.display_name
 
 
-class BilateralBet(models.Model):
+class OfficeBet(models.Model):
     match = models.ForeignKey(BilateralMatch, related_name='bet',  on_delete=models.CASCADE)
     ext_id = models.CharField(max_length=10)
     office = models.ForeignKey(Office, related_name='office_bets', on_delete=models.CASCADE)
@@ -46,11 +46,11 @@ class BilateralBet(models.Model):
 class UnsettledBet(models.Model):
     user = models.ForeignKey(User, related_name="ubets", on_delete=models.CASCADE)
     team = models.ForeignKey(Team, related_name="team_bets", on_delete=models.CASCADE)
-    bet = models.ForeignKey(BilateralBet, related_name="ubets", on_delete=models.CASCADE, null=True)
+    bet = models.ForeignKey(OfficeBet, related_name="ubets", on_delete=models.CASCADE, null=True)
     amount = models.IntegerField(default=0)
 
 
 class SettledBet(models.Model):
     user = models.ForeignKey(User, related_name="sbets", on_delete=models.CASCADE)
     amount = models.IntegerField(default=0)
-    bet = models.ForeignKey(BilateralBet, related_name="sbets", on_delete=models.CASCADE, null=True)
+    bet = models.ForeignKey(OfficeBet, related_name="sbets", on_delete=models.CASCADE, null=True)

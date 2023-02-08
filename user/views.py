@@ -79,7 +79,7 @@ def edit_admin(request, ext_id):
 
 
 def list_admin(request):
-    admins = User.objects.filter(office_admin=True).all().values("ext_id", "display_name", "first_name", "last_name", "office__name")
+    admins = User.objects.filter(office_admin=True).all().values("ext_id", "display_name", "first_name", "last_name", "office__name", "email")
     admin_list = {
         'admin_list': admins
     }
@@ -117,7 +117,7 @@ def edit_user(request, ext_id):
 
 
 def list_user(request):
-    users = User.objects.filter(office__name=request.user.office).all().values("ext_id", "display_name", "first_name", "last_name")
+    users = User.objects.filter(office__name=request.user.office).all().values("ext_id", "display_name", "first_name", "last_name", "email")
     user_list = {
         'user_list': users
     }
