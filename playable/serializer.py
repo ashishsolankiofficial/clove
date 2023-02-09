@@ -10,17 +10,20 @@ class MatchSerializer(serializers.ModelSerializer):
     teamA = TeamSerializer()
     teamB = TeamSerializer()
     tournament_name = serializers.CharField(source='tournament.name')
+    sport_name = serializers.CharField(source='tournament.sport.name')
     bet_ext_id = serializers.SerializerMethodField()
+    winner = serializers.SerializerMethodField()
 
     class Meta:
         model = BilateralMatch
-        fields = ['ext_id', 'name', 'match_start_time', 'teamA', 'teamB', 'tournament_name', 'bet_ext_id']
+        fields = ['ext_id', 'name', 'match_start_time', 'teamA', 'teamB', 'tournament_name', 'bet_ext_id', 'winner', 'sport_name']
 
     def get_bet_ext_id(self, obj):
-        if (obj.bet.last()):
-            return obj.bet.last().ext_id
-        else:
-            return None
+        office_ext_id = User.objects.get(ext_id=self.context.get("request").user.ext_id).office.ext_id
+        return obj.bet.get(office__ext_id=office_ext_id).ext_id if obj.bet.filter(office__ext_id=office_ext_id).first() else None
+
+    def get_winner(self, obj):
+        return obj.winner.name if obj.winner else None
 
 
 class UpcommingSerializer(serializers.ModelSerializer):
@@ -32,7 +35,7 @@ class UpcommingSerializer(serializers.ModelSerializer):
 
     def get_match(self, obj):
         matches = BilateralMatch.objects.filter(tournament__sport__ext_id=obj.ext_id, active=True)
-        return MatchSerializer(matches, many=True).data
+        return MatchSerializer(matches, many=True, context=self.context).data
 
 
 class YourBetSerializer(serializers.ModelSerializer):
