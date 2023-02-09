@@ -11,7 +11,8 @@ urlpatterns = [
     path('edit_match/<str:t_id>/<str:ext_id>/', view.edit_match, name='edit_match'),
     path('list_match/<str:t_id>/', view.list_match, name='list_match'),
     path('list_inactive_match/<str:t_id>/', view.list_inactive_match, name='list_inactive_match'),
-    path('settle_bilateral/<str:t_id>/<str:ext_id>/', view.settle_bilateral, name='settle_bilateral'),
+    path('choose_winner/<str:t_id>/<str:ext_id>/', view.choose_winner, name='choose_winner'),
+    path('distribute_rewards/<str:t_id>/<str:ext_id>/', view.distribute_rewards, name='distribute_rewards'),
 
     path('upcomming/', UpcommingView.as_view()),
     path('match/<str:ext_id>', MatchView.as_view()),

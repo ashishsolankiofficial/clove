@@ -23,7 +23,6 @@
                 <th>Team A</th>
                 <th>Team B</th>
                 <th>Winner</th>
-                <th>Edit</th>
             </tr>
         </thead>
         <tbody>
@@ -38,9 +37,8 @@
                 {% if i.winner__name %}
                 <td>{{i.winner__name}}</td>
                 {% else %}
-                <td><a href="{% url 'settle_bilateral' tournament.ext_id i.ext_id %}">Choose</a></td>
+                <td><a href="{% url 'choose_winner' tournament.ext_id i.ext_id %}">Choose</a></td>
                 {% endif%}
-                <td><a href="{% url 'edit_match' tournament.ext_id i.ext_id %}">Edit</a></td>
             </tr>
             {% endfor %}
         </tbody>

@@ -19,11 +19,11 @@
             <tr>
                 <th>Name</th>
                 <th>Match Time</th>
-                <th>Active</th>
                 <th>Created By</th>
                 <th>Team A</th>
                 <th>Team B</th>
                 <th>Winner</th>
+                <th>Distribute Rewards</th>
                 <th>Edit</th>
             </tr>
         </thead>
@@ -32,14 +32,19 @@
             <tr>
                 <td>{{i.name}}</td>
                 <td>{{i.match_start_time}}</td>
-                <td>{{i.active}} </td>
                 <td>{{i.created_by__display_name}}</td>
                 <td>{{i.teamA__name}}</td>
                 <td>{{i.teamB__name}}</td>
                 {% if i.winner__name %}
                 <td>{{i.winner__name}}</td>
+                {% if i.bet_settled %}
+                <td>Distributed</td>
                 {% else %}
-                <td><a href="{% url 'settle_bilateral' tournament.ext_id i.ext_id %}">Choose</a></td>
+                <td><a href="{% url 'distribute_rewards' tournament.ext_id i.ext_id %}">Distribute Rewards</a></td>
+                {% endif %}
+                {% else %}
+                <td><a href="{% url 'choose_winner' tournament.ext_id i.ext_id %}">Choose</a></td>
+                <td>No Winner</td>
                 {% endif%}
                 <td><a href="{% url 'edit_match' tournament.ext_id i.ext_id %}">Edit</a></td>
             </tr>
