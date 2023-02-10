@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block basecss %}
+{{block.super}}
+<link href="{% static 'user/css/style.css' %}" rel="stylesheet">
+{% endblock basecss %}
+
+{% block content %}
+<div class="row mt-3">
+    <a href="{% url 'workflow' %}">Back</a>
+</div>
+<div class="mt-5 login-container">
+    <h4>Office Administrator List</h4>
+    <div class="action-row">
+        <div><a href="{% url 'add_admin' %}">Add Admins</a></div>
+        <div><a href="{% url 'list_inactive_admin' %}">List Inactive Admins</a></div>
+    </div>
+    {% if admin_list %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Display Name</th>
+                <th>Name</th>
+                <th>Office</th>
+                <th>Email</th>
+                <th>Edit</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for i in admin_list %}
+            <tr>
+                <td>{{i.display_name}}</td>
+                <td>{{i.first_name}} {{i.last_name}}</td>
+                <td>{{i.office__name}}</td>
+                <td>{{i.email}}</td>
+                <td><a href="{% url 'edit_admin' i.ext_id %}">Edit</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div>No Active Admins Found</div>
+    {% endif %}
+</div>
+{% if admin_list.has_other_pages %}
+<div class="paginator-row">
+    <div class="btn-group" role="group" aria-label="Item pagination">
+        {% if admin_list.has_previous %}
+        <a href="?page={{ admin_list.previous_page_number }}" class="btn btn-outline-primary">&laquo;</a>
+        {% endif %}
+        {% for page_number in admin_list.paginator.page_range %}
+        {% if admin_list.number == page_number %}
+        <button class="btn btn-outline-primary active">
+            <span>{{ page_number }} <span class="sr-only"></span></span>
+        </button>
+        {% else %}
+        <a href="?page={{ page_number }}" class="btn btn-outline-primary">
+            {{ page_number }}
+        </a>
+        {% endif %}
+        {% endfor %}
+        {% if admin_list.has_next %}
+        <a href="?page={{ admin_list.next_page_number }}" class="btn btn-outline-primary">&raquo;</a>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}

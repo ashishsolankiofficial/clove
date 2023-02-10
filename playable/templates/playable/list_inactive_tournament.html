@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block basecss %}
+{{block.super}}
+<link href="{% static 'playable/css/style.css' %}" rel="stylesheet">
+{% endblock basecss %}
+
+{% block content %}
+<div class="row mt-3">
+    <a href="{% url 'list_tournament' %}">Back</a>
+</div>
+<div class="mt-5 login-container">
+    {% if tournament_list %}
+    <h4>In-Active Tournament List</h4>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Sport</th>
+                <th>Created By</th>
+                <th>Active</th>
+                <th>Edit</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for i in tournament_list %}
+            <tr>
+                <td>{{i.name}}</td>
+                <td>{{i.sport__name}} </td>
+                <td>{{i.created_by__display_name}}</td>
+                <td>{{i.active}}</td>
+                <td><a href="{% url 'edit_tournament' i.ext_id %}">Edit</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div>No In-Active Tournaments Found</div>
+    {% endif %}
+</div>
+{% if tournament_list.has_other_pages %}
+<div class="paginator-row">
+    <div class="btn-group" role="group" aria-label="Item pagination">
+        {% if tournament_list.has_previous %}
+        <a href="?page={{ tournament_list.previous_page_number }}" class="btn btn-outline-primary">&laquo;</a>
+        {% endif %}
+        {% for page_number in tournament_list.paginator.page_range %}
+        {% if tournament_list.number == page_number %}
+        <button class="btn btn-outline-primary active">
+            <span>{{ page_number }} <span class="sr-only"></span></span>
+        </button>
+        {% else %}
+        <a href="?page={{ page_number }}" class="btn btn-outline-primary">
+            {{ page_number }}
+        </a>
+        {% endif %}
+        {% endfor %}
+        {% if tournament_list.has_next %}
+        <a href="?page={{ tournament_list.next_page_number }}" class="btn btn-outline-primary">&raquo;</a>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}

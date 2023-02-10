@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block basecss %}
+{{block.super}}
+<link href="{% static 'user/css/style.css' %}" rel="stylesheet">
+{% endblock basecss %}
+
+{% block content %}
+<div class="row mt-3">
+    <a href="{% url 'workflow' %}">Back</a>
+</div>
+<div class="mt-5 login-container">
+    <h4>Office User List</h4>
+    <div class="action-row">
+        <div><a href="{% url 'add_user' %}">Add User</a></div>
+        <div><a href="{% url 'list_inactive_user' %}">List In-Active Users</a></div>
+    </div>
+    {% if user_list %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Display Name</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Edit</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for i in user_list %}
+            <tr>
+                <td>{{i.display_name}}</td>
+                <td>{{i.first_name}} {{i.last_name}}</td>
+                <td>{{i.email}}</td>
+                <td><a href="{% url 'edit_user' i.ext_id %}">Edit</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div>No Active Users Found</div>
+    {% endif %}
+</div>
+{% if user_list.has_other_pages %}
+<div class="paginator-row">
+    <div class="btn-group" role="group" aria-label="Item pagination">
+        {% if user_list.has_previous %}
+        <a href="?page={{ user_list.previous_page_number }}" class="btn btn-outline-primary">&laquo;</a>
+        {% endif %}
+        {% for page_number in user_list.paginator.page_range %}
+        {% if user_list.number == page_number %}
+        <button class="btn btn-outline-primary active">
+            <span>{{ page_number }} <span class="sr-only"></span></span>
+        </button>
+        {% else %}
+        <a href="?page={{ page_number }}" class="btn btn-outline-primary">
+            {{ page_number }}
+        </a>
+        {% endif %}
+        {% endfor %}
+        {% if user_list.has_next %}
+        <a href="?page={{ user_list.next_page_number }}" class="btn btn-outline-primary">&raquo;</a>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}

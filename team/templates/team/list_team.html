@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block basecss %}
+{{block.super}}
+<link href="{% static 'team/css/style.css' %}" rel="stylesheet">
+{% endblock basecss %}
+
+{% block content %}
+<div class="row mt-3">
+    <a href="{% url 'workflow' %}">Back</a>
+</div>
+<div class="mt-5 login-container">
+    <h4>Team List</h4>
+    <div class="action-row">
+        <div><a href="{% url 'add_team' %}">Add Teams</a></div>
+        <div><a href="{% url 'list_inactive_team' %}">List Inactive Team</a></div>
+    </div>
+    {% if team_list %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Country</th>
+                <th>Created By</th>
+                <th>Sport</th>
+                <th>Active</th>
+                <th>Edit</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for i in team_list %}
+            <tr>
+                <td>{{i.name}}</td>
+                <td>{{i.country__name}} </td>
+                <td>{{i.created_by__display_name}}</td>
+                <td>{{i.sport__name}}</td>
+                <td>{{i.active}}</td>
+                <td><a href="{% url 'edit_team' i.ext_id %}">Edit</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div>No Active Team Found</div>
+    {% endif %}
+</div>
+{% if team_list.has_other_pages %}
+<div class="paginator-row">
+    <div class="btn-group" role="group" aria-label="Item pagination">
+        {% if team_list.has_previous %}
+        <a href="?page={{ team_list.previous_page_number }}" class="btn btn-outline-primary">&laquo;</a>
+        {% endif %}
+        {% for page_number in team_list.paginator.page_range %}
+        {% if team_list.number == page_number %}
+        <button class="btn btn-outline-primary active">
+            <span>{{ page_number }} <span class="sr-only"></span></span>
+        </button>
+        {% else %}
+        <a href="?page={{ page_number }}" class="btn btn-outline-primary">
+            {{ page_number }}
+        </a>
+        {% endif %}
+        {% endfor %}
+        {% if team_list.has_next %}
+        <a href="?page={{ team_list.next_page_number }}" class="btn btn-outline-primary">&raquo;</a>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}

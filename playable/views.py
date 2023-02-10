@@ -1,5 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.pagination import LimitOffsetPagination
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render, redirect, get_object_or_404
 from playable.forms import TournamentForm, BilateralMatchForm, BilateralMatchWinnerForm
 from playable.models import Tournament, BilateralMatch, Sport
@@ -30,11 +32,12 @@ class MatchView(APIView):
         return Response(serializer.data)
 
 
-class YourBetsView(APIView):
+class YourBetsView(APIView, LimitOffsetPagination):
     def get(self, request):
         match = BilateralMatch.objects.filter(bet__ubets__user__ext_id=request.user.ext_id)
-        serializer = YourBetSerializer(match, many=True, context={'request': request})
-        return Response(serializer.data)
+        results = self.paginate_queryset(match, request, view=self)
+        serializer = YourBetSerializer(results, many=True, context={'request': request})
+        return self.get_paginated_response(serializer.data)
 
 
 def add_tournament(request):
@@ -47,7 +50,7 @@ def add_tournament(request):
             return redirect("list_tournament")
     else:
         fm = TournamentForm()
-    return render(request, 'add_tournament.html', {'form': fm})
+    return render(request, 'playable/add_tournament.html', {'form': fm})
 
 
 def edit_tournament(request, ext_id):
@@ -61,7 +64,7 @@ def edit_tournament(request, ext_id):
             return redirect("list_tournament")
     else:
         fm = TournamentForm(instance=tournament)
-    return render(request, 'add_tournament.html', {'form': fm})
+    return render(request, 'playable/add_tournament.html', {'form': fm})
 
 
 def list_tournament(request):
@@ -69,15 +72,23 @@ def list_tournament(request):
     tournament_list = {
         'tournament_list': tournaments
     }
-    return render(request, 'list_tournament.html', tournament_list)
+    return render(request, 'playable/list_tournament.html', tournament_list)
 
 
 def list_inactive_tournament(request):
     tournaments = Tournament.objects.filter(active=False).values('ext_id', 'name', 'sport__name', 'created_by__display_name', 'active')
+    page = request.GET.get('page', 1)
+    paginator = Paginator(tournaments, 10)
+    try:
+        tournaments = paginator.page(page)
+    except PageNotAnInteger:
+        tournaments = paginator.page(1)
+    except EmptyPage:
+        tournaments = paginator.page(paginator.num_pages)
     tournament_list = {
         'tournament_list': tournaments
     }
-    return render(request, 'list_inactive_tournament.html', tournament_list)
+    return render(request, 'playable/list_inactive_tournament.html', tournament_list)
 
 
 def add_match(request, t_id):
@@ -92,7 +103,7 @@ def add_match(request, t_id):
             return redirect("list_match", t_id)
     else:
         fm = BilateralMatchForm(tournament=tournament)
-    return render(request, 'add_match.html', {'form': fm, 'tournament_id': t_id})
+    return render(request, 'playable/add_match.html', {'form': fm, 'tournament_id': t_id})
 
 
 def edit_match(request, t_id, ext_id):
@@ -118,7 +129,7 @@ def edit_match(request, t_id, ext_id):
             return redirect("list_match", t_id)
     else:
         fm = BilateralMatchForm(instance=match, tournament=tournament)
-    return render(request, 'add_match.html', {'form': fm, 'tournament_id': t_id})
+    return render(request, 'playable/add_match.html', {'form': fm, 'tournament_id': t_id})
 
 
 def list_match(request, t_id):
@@ -139,18 +150,26 @@ def list_match(request, t_id):
         'tournament': tournament,
         'match_list': matches
     }
-    return render(request, 'list_match.html', match_list)
+    return render(request, 'playable/list_match.html', match_list)
 
 
 def list_inactive_match(request, t_id):
     tournament = Tournament.objects.get(ext_id=t_id)
     matches = BilateralMatch.objects.filter(tournament__ext_id=t_id, active=False).values('ext_id', 'name', 'match_start_time',
                                                                                           'active', 'teamA__name', 'teamB__name', 'winner__name', 'created_by__display_name')
+    page = request.GET.get('page', 1)
+    paginator = Paginator(matches, 10)
+    try:
+        matches = paginator.page(page)
+    except PageNotAnInteger:
+        matches = paginator.page(1)
+    except EmptyPage:
+        matches = paginator.page(paginator.num_pages)
     match_list = {
         'tournament': tournament,
         'match_list': matches
     }
-    return render(request, 'list_inactive_match.html', match_list)
+    return render(request, 'playable/list_inactive_match.html', match_list)
 
 
 def choose_winner(request, t_id, ext_id):
@@ -165,7 +184,7 @@ def choose_winner(request, t_id, ext_id):
         return redirect("list_match", t_id)
     else:
         fm = BilateralMatchWinnerForm(teams=[match.teamA.ext_id, match.teamB.ext_id])
-    return render(request, 'choose_winner.html', {'form': fm, 'tournament_id': t_id})
+    return render(request, 'playable/choose_winner.html', {'form': fm, 'tournament_id': t_id})
 
 
 def distribute_rewards(request, t_id, ext_id):
