@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from team.forms import TeamForm
 from team.models import Team
 from user.models import User
@@ -14,7 +15,7 @@ def add_team(request):
             return redirect('list_team')
     else:
         fm = TeamForm()
-    return render(request, 'add_team.html', {'form': fm})
+    return render(request, 'team/add_team.html', {'form': fm})
 
 
 def edit_team(request, ext_id):
@@ -28,12 +29,36 @@ def edit_team(request, ext_id):
             return redirect("list_team")
     else:
         fm = TeamForm(instance=team)
-    return render(request, 'add_tournament.html', {'form': fm})
+    return render(request, 'playable/add_tournament.html', {'form': fm})
 
 
 def list_team(request):
-    teams = Team.objects.all().values('ext_id', 'type', 'name', 'country__name', 'created_by__display_name', 'sport__name', 'active')
+    teams = Team.objects.filter(active=True).values('ext_id', 'type', 'name', 'country__name', 'created_by__display_name', 'sport__name', 'active')
+    page = request.GET.get('page', 1)
+    paginator = Paginator(teams, 10)
+    try:
+        teams = paginator.page(page)
+    except PageNotAnInteger:
+        teams = paginator.page(1)
+    except EmptyPage:
+        teams = paginator.page(paginator.num_pages)
     team_list = {
         'team_list': teams
     }
-    return render(request, 'list_team.html', team_list)
+    return render(request, 'team/list_team.html', team_list)
+
+
+def list_inactive_team(request):
+    teams = Team.objects.filter(active=False).values('ext_id', 'type', 'name', 'country__name', 'created_by__display_name', 'sport__name', 'active')
+    page = request.GET.get('page', 1)
+    paginator = Paginator(teams, 10)
+    try:
+        teams = paginator.page(page)
+    except PageNotAnInteger:
+        teams = paginator.page(1)
+    except EmptyPage:
+        teams = paginator.page(paginator.num_pages)
+    team_list = {
+        'team_list': teams
+    }
+    return render(request, 'team/list_inactive_team.html', team_list)

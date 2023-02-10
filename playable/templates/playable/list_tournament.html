@@ -3,16 +3,20 @@
 
 {% block basecss %}
 {{block.super}}
-<link href="{% static 'css/style.css' %}" rel="stylesheet">
+<link href="{% static 'playable/css/style.css' %}" rel="stylesheet">
 {% endblock basecss %}
 
 {% block content %}
 <div class="row mt-3">
-    <a href="{% url 'list_tournament' %}">Back</a>
+    <a href="{% url 'workflow' %}">Back</a>
 </div>
 <div class="mt-5 login-container">
+    <h4>Tournament List</h4>
+    <div class="action-row">
+        <div><a href="{% url 'add_tournament' %}">Add Tournament</a></div>
+        <div><a href="{% url 'list_inactive_tournament' %}">List Inactive Tournaments</a></div>
+    </div>
     {% if tournament_list %}
-    <h4>In-Active Tournament List</h4>
     <table class="table table-striped">
         <thead>
             <tr>
@@ -21,6 +25,7 @@
                 <th>Created By</th>
                 <th>Active</th>
                 <th>Edit</th>
+                <th>Matches</th>
             </tr>
         </thead>
         <tbody>
@@ -31,12 +36,13 @@
                 <td>{{i.created_by__display_name}}</td>
                 <td>{{i.active}}</td>
                 <td><a href="{% url 'edit_tournament' i.ext_id %}">Edit</a></td>
+                <td><a href="{% url 'list_match' i.ext_id %}">Manage Matches</a></td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
     {% else %}
-    <div>No In-Active Tournaments Found</div>
+    <div>No Active Tournaments Found</div>
     {% endif %}
 </div>
 {% endblock %}

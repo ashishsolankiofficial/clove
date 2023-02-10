@@ -2,6 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import render, redirect, get_object_or_404
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from user.forms import AdminForm, UserForm
 from user.models import User
 from user.serializer import UserProfileSerializer
@@ -45,7 +46,7 @@ class ResetPassword(APIView):
 
 
 def show_workflow(request):
-    return render(request, 'workflow.html', {'user': request.user})
+    return render(request, 'user/workflow.html', {'user': request.user})
 
 
 def add_admin(request, ext_id=None):
@@ -60,7 +61,7 @@ def add_admin(request, ext_id=None):
             return redirect("list_admin")
     else:
         fm = AdminForm()
-    return render(request, 'add_admin.html', {'form': fm})
+    return render(request, 'user/add_admin.html', {'form': fm})
 
 
 def edit_admin(request, ext_id):
@@ -75,15 +76,39 @@ def edit_admin(request, ext_id):
             return redirect("list_admin")
     else:
         fm = AdminForm(instance=user_profile)
-    return render(request, 'add_admin.html', {'form': fm})
+    return render(request, 'user/add_admin.html', {'form': fm})
 
 
 def list_admin(request):
-    admins = User.objects.filter(office_admin=True).all().values("ext_id", "display_name", "first_name", "last_name", "office__name", "email")
+    admins = User.objects.filter(office_admin=True, is_active=True).all().values("ext_id", "display_name", "first_name", "last_name", "office__name", "email")
+    page = request.GET.get('page', 1)
+    paginator = Paginator(admins, 10)
+    try:
+        admins = paginator.page(page)
+    except PageNotAnInteger:
+        admins = paginator.page(1)
+    except EmptyPage:
+        admins = paginator.page(paginator.num_pages)
     admin_list = {
         'admin_list': admins
     }
-    return render(request, 'list_admin.html', admin_list)
+    return render(request, 'user/list_admin.html', admin_list)
+
+
+def list_inactive_admin(request):
+    admins = User.objects.filter(office_admin=True, is_active=False).all().values("ext_id", "display_name", "first_name", "last_name", "office__name", "email")
+    page = request.GET.get('page', 1)
+    paginator = Paginator(admins, 10)
+    try:
+        admins = paginator.page(page)
+    except PageNotAnInteger:
+        admins = paginator.page(1)
+    except EmptyPage:
+        admins = paginator.page(paginator.num_pages)
+    admin_list = {
+        'admin_list': admins
+    }
+    return render(request, 'user/list_inactive_admin.html', admin_list)
 
 
 def add_user(request):
@@ -98,7 +123,7 @@ def add_user(request):
             return redirect("list_user")
     else:
         fm = UserForm()
-    return render(request, 'add_user.html', {'form': fm})
+    return render(request, 'user/add_user.html', {'form': fm})
 
 
 def edit_user(request, ext_id):
@@ -113,15 +138,39 @@ def edit_user(request, ext_id):
             return redirect("list_user")
     else:
         fm = UserForm(instance=user_profile)
-    return render(request, 'add_user.html', {'form': fm})
+    return render(request, 'user/add_user.html', {'form': fm})
 
 
 def list_user(request):
-    users = User.objects.filter(office__name=request.user.office).all().values("ext_id", "display_name", "first_name", "last_name", "email")
+    users = User.objects.filter(office__name=request.user.office, is_active=True).all().values("ext_id", "display_name", "first_name", "last_name", "email")
+    page = request.GET.get('page', 1)
+    paginator = Paginator(users, 10)
+    try:
+        users = paginator.page(page)
+    except PageNotAnInteger:
+        users = paginator.page(1)
+    except EmptyPage:
+        users = paginator.page(paginator.num_pages)
     user_list = {
         'user_list': users
     }
-    return render(request, 'list_user.html', user_list)
+    return render(request, 'user/list_user.html', user_list)
+
+
+def list_inactive_user(request):
+    users = User.objects.filter(office__name=request.user.office, is_active=False).all().values("ext_id", "display_name", "first_name", "last_name", "email")
+    page = request.GET.get('page', 1)
+    paginator = Paginator(users, 10)
+    try:
+        users = paginator.page(page)
+    except PageNotAnInteger:
+        users = paginator.page(1)
+    except EmptyPage:
+        users = paginator.page(paginator.num_pages)
+    user_list = {
+        'user_list': users
+    }
+    return render(request, 'user/list_inactive_user.html', user_list)
 
 
 def login_admin(request):
@@ -144,7 +193,7 @@ def login_admin(request):
         else:
             messages.error(request, "Invalid username or password.")
     fm = AuthenticationForm()
-    return render(request, 'admin_login.html', {'form': fm})
+    return render(request, 'user/admin_login.html', {'form': fm})
 
 
 def logout_admin(request):
