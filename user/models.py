@@ -18,6 +18,8 @@ class User(AbstractUser):
     office_admin = models.BooleanField(default=False)
     super_admin = models.BooleanField(default=False)
     username = None
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name', 'display_name']

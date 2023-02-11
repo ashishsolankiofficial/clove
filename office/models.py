@@ -6,6 +6,8 @@ class Office(models.Model):
     ext_id = models.CharField(max_length=10)
     name = models.CharField(max_length=50)
     address = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def save(self, *args, **kwargs):
         while not self.ext_id:
@@ -23,6 +25,8 @@ class Task(models.Model):
     task = models.TextField()
     active = models.BooleanField(default=True)
     office = models.ForeignKey(Office, related_name='tasks', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def save(self, *args, **kwargs):
         while not self.ext_id:

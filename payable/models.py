@@ -48,9 +48,11 @@ class UnsettledBet(models.Model):
     team = models.ForeignKey(Team, related_name="team_bets", on_delete=models.CASCADE)
     bet = models.ForeignKey(OfficeBet, related_name="ubets", on_delete=models.CASCADE, null=True)
     amount = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
 class SettledBet(models.Model):
     user = models.ForeignKey(User, related_name="sbets", on_delete=models.CASCADE)
     amount = models.IntegerField(default=0)
     bet = models.ForeignKey(OfficeBet, related_name="sbets", on_delete=models.CASCADE, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)

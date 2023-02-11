@@ -25,6 +25,8 @@ class Tournament(models.Model):
     active = models.BooleanField(default=True)
     sport = models.ForeignKey(Sport, related_name='tournament', on_delete=models.CASCADE)
     created_by = models.ForeignKey(User, related_name='tournament', on_delete=models.CASCADE, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def save(self, *args, **kwargs):
         while not self.ext_id:
@@ -47,6 +49,8 @@ class BilateralMatch(models.Model):
     winner = models.ForeignKey(Team, related_name='won_matches', on_delete=models.CASCADE, null=True)
     match_start_time = models.DateTimeField(blank=False, null=False)
     tournament = models.ForeignKey(Tournament, related_name='tournament_matches', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def save(self, *args, **kwargs):
         while not self.ext_id:
