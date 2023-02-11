@@ -19,6 +19,8 @@ class Team(models.Model):
     country = models.ForeignKey(Country, related_name='team', on_delete=models.CASCADE)
     sport = models.ForeignKey("playable.Sport", related_name="teams", on_delete=models.CASCADE, null=True)
     created_by = models.ForeignKey(User, related_name='bilateralmatch', on_delete=models.CASCADE, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
