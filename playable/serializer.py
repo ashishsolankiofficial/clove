@@ -34,7 +34,7 @@ class UpcommingSerializer(serializers.ModelSerializer):
         fields = ['ext_id', 'name', 'match']
 
     def get_match(self, obj):
-        matches = BilateralMatch.objects.filter(tournament__sport__ext_id=obj.ext_id, active=True)
+        matches = BilateralMatch.objects.filter(tournament__sport__ext_id=obj.ext_id, active=True).order_by('match_start_time')
         return MatchSerializer(matches, many=True, context=self.context).data
 
 
@@ -64,6 +64,14 @@ class YourBetSerializer(serializers.ModelSerializer):
 
     def get_refund(self, obj):
         office_ext_id = User.objects.get(ext_id=self.context.get("request").user.ext_id).office.ext_id
-        if obj.active == False and False in obj.bet.all().values_list('settled', flat=True):
-            return True
-        return False if len(obj.bet.get(office__ext_id=office_ext_id).ubets.all().values('team__ext_id').distinct()) == 2 else True
+        if obj.active == False:
+            if False in obj.bet.all().values_list('settled', flat=True):
+                return True
+        office_bet = obj.bet.get(office__ext_id=office_ext_id)
+        if office_bet.settled == True:
+            if len(office_bet.ubets.all().values('team__ext_id').distinct()) == 2:
+                return False
+            else:
+                return True
+        else:
+            return False

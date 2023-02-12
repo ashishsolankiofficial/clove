@@ -12,7 +12,6 @@ class User(AbstractUser):
     ext_id = models.CharField(max_length=10)
     email = models.EmailField(max_length=254, unique=True)
     display_name = models.CharField(max_length=50, unique=True)
-    phone_no = models.CharField(max_length=10, unique=True)
     can_play = models.BooleanField(default=True)
     office = models.ForeignKey(Office, related_name='employees', on_delete=models.CASCADE, null=True)
     office_admin = models.BooleanField(default=False)

@@ -34,7 +34,7 @@ class MatchView(APIView):
 
 class YourBetsView(APIView, LimitOffsetPagination):
     def get(self, request):
-        match = BilateralMatch.objects.filter(bet__ubets__user__ext_id=request.user.ext_id)
+        match = BilateralMatch.objects.filter(bet__ubets__user__ext_id=request.user.ext_id).order_by('match_start_time')
         results = self.paginate_queryset(match, request, view=self)
         serializer = YourBetSerializer(results, many=True, context={'request': request})
         return self.get_paginated_response(serializer.data)
@@ -68,7 +68,7 @@ def edit_tournament(request, ext_id):
 
 
 def list_tournament(request):
-    tournaments = Tournament.objects.filter(active=True).values('ext_id', 'name', 'sport__name', 'created_by__display_name', 'active')
+    tournaments = Tournament.objects.filter(active=True).order_by('-created_at').values('ext_id', 'name', 'sport__name', 'created_by__display_name', 'active')
     tournament_list = {
         'tournament_list': tournaments
     }
@@ -76,7 +76,7 @@ def list_tournament(request):
 
 
 def list_inactive_tournament(request):
-    tournaments = Tournament.objects.filter(active=False).values('ext_id', 'name', 'sport__name', 'created_by__display_name', 'active')
+    tournaments = Tournament.objects.filter(active=False).order_by('-created_at').values('ext_id', 'name', 'sport__name', 'created_by__display_name', 'active')
     page = request.GET.get('page', 1)
     paginator = Paginator(tournaments, 10)
     try:
@@ -135,8 +135,8 @@ def edit_match(request, t_id, ext_id):
 def list_match(request, t_id):
     tournament = Tournament.objects.get(ext_id=t_id)
     user = User.objects.get(ext_id=request.user.ext_id)
-    matches = BilateralMatch.objects.filter(tournament__ext_id=t_id, active=True).values('ext_id', 'name', 'match_start_time',
-                                                                                         'active', 'teamA__name', 'teamB__name', 'winner__name', 'created_by__display_name')
+    matches = BilateralMatch.objects.filter(tournament__ext_id=t_id, active=True).order_by('-created_at').values('ext_id', 'name', 'match_start_time',
+                                                                                                                 'active', 'teamA__name', 'teamB__name', 'winner__name', 'created_by__display_name')
     for match in matches:
         bet = OfficeBet.objects.filter(match__ext_id=match['ext_id'], office__ext_id=user.office.ext_id).first()
         if bet:
@@ -155,8 +155,8 @@ def list_match(request, t_id):
 
 def list_inactive_match(request, t_id):
     tournament = Tournament.objects.get(ext_id=t_id)
-    matches = BilateralMatch.objects.filter(tournament__ext_id=t_id, active=False).values('ext_id', 'name', 'match_start_time',
-                                                                                          'active', 'teamA__name', 'teamB__name', 'winner__name', 'created_by__display_name')
+    matches = BilateralMatch.objects.filter(tournament__ext_id=t_id, active=False).order_by('-created_at').values('ext_id', 'name', 'match_start_time',
+                                                                                                                  'active', 'teamA__name', 'teamB__name', 'winner__name', 'created_by__display_name')
     page = request.GET.get('page', 1)
     paginator = Paginator(matches, 10)
     try:
@@ -180,6 +180,9 @@ def choose_winner(request, t_id, ext_id):
             match.save()
         if match.teamB.id == int(request.POST['winner']):
             match.winner = match.teamB
+            match.save()
+        if not match.bet.all().exists():
+            match.active = False
             match.save()
         return redirect("list_match", t_id)
     else:

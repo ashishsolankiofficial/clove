@@ -10,7 +10,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['ext_id', 'first_name', 'last_name', 'email', 'phone_no', 'display_name', 'coins']
+        fields = ['ext_id', 'first_name', 'last_name', 'email', 'display_name', 'coins']
         read_only_fields = ('email', 'ext_id', 'coins')
 
     def get_coins(self, obj):
