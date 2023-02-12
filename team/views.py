@@ -33,7 +33,7 @@ def edit_team(request, ext_id):
 
 
 def list_team(request):
-    teams = Team.objects.filter(active=True).values('ext_id', 'type', 'name', 'country__name', 'created_by__display_name', 'sport__name', 'active')
+    teams = Team.objects.filter(active=True).order_by('-created_at').values('ext_id', 'type', 'name', 'country__name', 'created_by__display_name', 'sport__name', 'active')
     page = request.GET.get('page', 1)
     paginator = Paginator(teams, 10)
     try:
@@ -49,7 +49,7 @@ def list_team(request):
 
 
 def list_inactive_team(request):
-    teams = Team.objects.filter(active=False).values('ext_id', 'type', 'name', 'country__name', 'created_by__display_name', 'sport__name', 'active')
+    teams = Team.objects.filter(active=False).order_by('-created_at').values('ext_id', 'type', 'name', 'country__name', 'created_by__display_name', 'sport__name', 'active')
     page = request.GET.get('page', 1)
     paginator = Paginator(teams, 10)
     try:

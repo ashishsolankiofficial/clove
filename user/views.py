@@ -80,7 +80,7 @@ def edit_admin(request, ext_id):
 
 
 def list_admin(request):
-    admins = User.objects.filter(office_admin=True, is_active=True).all().values("ext_id", "display_name", "first_name", "last_name", "office__name", "email")
+    admins = User.objects.filter(office_admin=True, is_active=True).order_by('-created_at').values("ext_id", "display_name", "first_name", "last_name", "office__name", "email")
     page = request.GET.get('page', 1)
     paginator = Paginator(admins, 10)
     try:
@@ -96,7 +96,7 @@ def list_admin(request):
 
 
 def list_inactive_admin(request):
-    admins = User.objects.filter(office_admin=True, is_active=False).all().values("ext_id", "display_name", "first_name", "last_name", "office__name", "email")
+    admins = User.objects.filter(office_admin=True, is_active=False).order_by('-created_at').values("ext_id", "display_name", "first_name", "last_name", "office__name", "email")
     page = request.GET.get('page', 1)
     paginator = Paginator(admins, 10)
     try:
@@ -142,7 +142,7 @@ def edit_user(request, ext_id):
 
 
 def list_user(request):
-    users = User.objects.filter(office__name=request.user.office, is_active=True).all().values("ext_id", "display_name", "first_name", "last_name", "email")
+    users = User.objects.filter(office__name=request.user.office, is_active=True).order_by('-created_at').values("ext_id", "display_name", "first_name", "last_name", "email")
     page = request.GET.get('page', 1)
     paginator = Paginator(users, 10)
     try:
@@ -158,7 +158,7 @@ def list_user(request):
 
 
 def list_inactive_user(request):
-    users = User.objects.filter(office__name=request.user.office, is_active=False).all().values("ext_id", "display_name", "first_name", "last_name", "email")
+    users = User.objects.filter(office__name=request.user.office, is_active=False).order_by('-created_at').values("ext_id", "display_name", "first_name", "last_name", "email")
     page = request.GET.get('page', 1)
     paginator = Paginator(users, 10)
     try:

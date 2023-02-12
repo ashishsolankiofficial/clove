@@ -12,12 +12,13 @@ class User(AbstractUser):
     ext_id = models.CharField(max_length=10)
     email = models.EmailField(max_length=254, unique=True)
     display_name = models.CharField(max_length=50, unique=True)
-    phone_no = models.CharField(max_length=10, unique=True)
     can_play = models.BooleanField(default=True)
     office = models.ForeignKey(Office, related_name='employees', on_delete=models.CASCADE, null=True)
     office_admin = models.BooleanField(default=False)
     super_admin = models.BooleanField(default=False)
     username = None
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name', 'display_name']
