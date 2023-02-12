@@ -53,7 +53,7 @@ def edit_task(request, ext_id):
 
 def list_task(request):
     user = User.objects.get(ext_id=request.user.ext_id)
-    tasks = Task.objects.filter(office=user.office)
+    tasks = Task.objects.filter(office=user.office).order_by('id')
     page = request.GET.get('page', 1)
     paginator = Paginator(tasks, 10)
     try:
