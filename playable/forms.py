@@ -1,4 +1,5 @@
 from django import forms
+from django.core.exceptions import ValidationError
 from playable.models import Tournament, BilateralMatch
 from team.models import Team
 
@@ -29,9 +30,15 @@ class BilateralMatchForm(forms.ModelForm):
     def __init__(self, tournament=None, *args, **kwargs):
         super(BilateralMatchForm, self).__init__(*args, **kwargs)
         if tournament:
-            self.fields['teamA'].queryset = Team.objects.filter(sport=tournament.sport)
-            self.fields['teamB'].queryset = Team.objects.filter(sport=tournament.sport)
+            self.fields['teamA'].queryset = Team.objects.filter(sport=tournament.sport, active=True)
+            self.fields['teamB'].queryset = Team.objects.filter(sport=tournament.sport, active=True)
 
+    def clean(self):
+        team_a = self.cleaned_data['teamA']
+        team_b = self.cleaned_data['teamB']
+        if team_a == team_b:
+            raise ValidationError("Team A & Team B cannot be same")
+        return self.cleaned_data
 
 class BilateralMatchWinnerForm(forms.ModelForm):
     class Meta:

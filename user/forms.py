@@ -10,7 +10,7 @@ class AdminForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email', 'display_name', 'office']
+        fields = ['first_name', 'last_name', 'email', 'display_name', 'office', 'is_active']
 
 
 class UserForm(forms.ModelForm):
@@ -19,4 +19,4 @@ class UserForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email', 'display_name']
+        fields = ['first_name', 'last_name', 'email', 'display_name', 'is_active']
