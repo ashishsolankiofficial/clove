@@ -94,7 +94,7 @@ def list_inactive_tournament(request):
 def add_match(request, t_id):
     tournament = Tournament.objects.get(ext_id=t_id)
     if request.method == 'POST':
-        fm = BilateralMatchForm(data=request.POST)
+        fm = BilateralMatchForm(data=request.POST, tournament=tournament)
         if fm.is_valid():
             match = fm.save(commit=False)
             match.created_by = User.objects.get(ext_id=request.user.ext_id)
