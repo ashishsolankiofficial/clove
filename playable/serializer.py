@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from playable.models import Sport, BilateralMatch
-from payable.models import UnsettledBet
+from payable.models import UnsettledBet, OfficeBet
 from payable.serializer import UnsettledBetSerializer
 from team.serializer import TeamSerializer
 from user.models import User
@@ -34,7 +34,10 @@ class UpcommingSerializer(serializers.ModelSerializer):
         fields = ['ext_id', 'name', 'match']
 
     def get_match(self, obj):
-        matches = BilateralMatch.objects.filter(tournament__sport__ext_id=obj.ext_id, active=True).order_by('match_start_time')
+        unsettled_office_bet_ids = OfficeBet.objects.filter(settled=False, office=User.objects.get(ext_id=self.context.get("request").user.ext_id).office).values_list('ext_id', flat=True)
+        match_with_unsettled_bets = BilateralMatch.objects.filter(tournament__sport__ext_id=obj.ext_id, active=True, bet__ext_id__in=unsettled_office_bet_ids).order_by('match_start_time')
+        match_with_no_bet = BilateralMatch.objects.filter(tournament__sport__ext_id=obj.ext_id, active=True, bet__isnull=True)
+        matches = match_with_unsettled_bets | match_with_no_bet
         return MatchSerializer(matches, many=True, context=self.context).data
 
 
@@ -45,11 +48,12 @@ class YourBetSerializer(serializers.ModelSerializer):
     tournament_name = serializers.CharField(source='tournament.name')
     ubet = serializers.SerializerMethodField()
     bet_settled = serializers.SerializerMethodField()
+    win_amount = serializers.SerializerMethodField()
     refund = serializers.SerializerMethodField()
 
     class Meta:
         model = BilateralMatch
-        fields = ['ext_id', 'name', 'match_start_time', 'teamA', 'teamB', 'tournament_name', 'ubet', 'bet_settled', 'winner_ext_id', 'refund']
+        fields = ['ext_id', 'name', 'match_start_time', 'teamA', 'teamB', 'tournament_name', 'ubet', 'bet_settled', 'winner_ext_id', 'refund', 'win_amount']
 
     def get_winner_ext_id(self, obj):
         return obj.winner.ext_id if obj.winner else None
@@ -75,3 +79,9 @@ class YourBetSerializer(serializers.ModelSerializer):
                 return True
         else:
             return False
+
+    def get_win_amount(self, obj):
+        user = User.objects.get(ext_id=self.context.get("request").user.ext_id)
+        sbet = obj.bet.get(office=user.office).sbets.filter(user=user).first()
+        ubet = obj.bet.get(office=user.office).ubets.filter(user=user).first()
+        return sbet.amount - ubet.amount if sbet else None
