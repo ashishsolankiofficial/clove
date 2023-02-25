@@ -7,17 +7,20 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.login_admin, name='admin_login'),
-    path('admin_logout/', views.logout_admin, name='admin_logout'),
-    path('workflow/', views.show_workflow, name='workflow'),
+    path('portal/', views.login_admin, name='admin_login'),
+    path('portal/admin_logout/', views.logout_admin, name='admin_logout'),
+    path('portal/workflow/', views.show_workflow, name='workflow'),
 
-    path('user/', include('user.urls')),
-    path('team/', include('team.urls')),
-    path('playable/', include('playable.urls')),
-    path('payable/', include('payable.urls')),
-    path('office/', include('office.urls')),
+    path('api/user/', include('user.api_urls')),
+    path('portal/user/', include('user.portal_urls')),
+    path('portal/team/', include('team.portal_urls')),
+    path('portal/playable/', include('playable.portal_urls')),
+    path('api/playable/', include('playable.api_urls')),
+    path('api/payable/', include('payable.api_urls')),
+    path('portal/office/', include('office.portal_urls')),
+    path('api/office/', include('office.api_urls')),
 
-    path('auth/login/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('auth/token-refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('auth/token-verify/', TokenVerifyView.as_view(), name='token_verify'),
+    path('api/auth/login/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/auth/token-refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/auth/token-verify/', TokenVerifyView.as_view(), name='token_verify'),
 ]

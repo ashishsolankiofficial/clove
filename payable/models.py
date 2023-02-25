@@ -8,7 +8,7 @@ from playable.models import BilateralMatch
 
 class PayableProfile(models.Model):
     ext_id = models.CharField(max_length=10)
-    user = models.ForeignKey(User, related_name='profile',  on_delete=models.CASCADE, null=True)
+    user = models.ForeignKey(User, related_name='profile', on_delete=models.CASCADE, null=True)
     coins = models.IntegerField(default=1000)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -25,7 +25,7 @@ class PayableProfile(models.Model):
 
 
 class OfficeBet(models.Model):
-    match = models.ForeignKey(BilateralMatch, related_name='bet',  on_delete=models.CASCADE)
+    match = models.ForeignKey(BilateralMatch, related_name='bet', on_delete=models.CASCADE)
     ext_id = models.CharField(max_length=10)
     office = models.ForeignKey(Office, related_name='office_bets', on_delete=models.CASCADE)
     settled = models.BooleanField(default=False)

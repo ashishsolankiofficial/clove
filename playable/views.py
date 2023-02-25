@@ -9,8 +9,6 @@ from payable.models import SettledBet, PayableProfile, OfficeBet
 from user.models import User
 from datetime import datetime
 from django.db.models import Sum
-
-from playable.models import Sport, BilateralMatch
 from playable.serializer import UpcommingSerializer, MatchSerializer, YourBetSerializer
 
 
@@ -121,7 +119,7 @@ def edit_match(request, t_id, ext_id):
                     ubets = office_bet.ubets.all()
                     for ubet in ubets:
                         refund_amount = ubet.amount
-                        sbet = SettledBet.objects.create(bet=office_bet, user=ubet.user, amount=refund_amount)
+                        SettledBet.objects.create(bet=office_bet, user=ubet.user, amount=refund_amount)
                         user_profile = PayableProfile.objects.get(user=ubet.user)
                         user_profile.coins = user_profile.coins + refund_amount
                         user_profile.save()
@@ -206,7 +204,7 @@ def distribute_rewards(request, t_id, ext_id):
             team_b_total = team_b_ubets.aggregate(Sum('amount'))['amount__sum']
         if match.teamA.ext_id == match.winner.ext_id:
             for ubet in team_a_ubets:
-                win_amount = ubet.amount + (team_b_total * ubet.amount/team_a_total)
+                win_amount = ubet.amount + (team_b_total * ubet.amount / team_a_total)
                 sbet = SettledBet.objects.create(bet=office_bet, user=ubet.user, amount=win_amount)
                 user_profile = PayableProfile.objects.get(user=ubet.user)
                 user_profile.coins = user_profile.coins + sbet.amount
@@ -220,7 +218,7 @@ def distribute_rewards(request, t_id, ext_id):
                     user_profile.save()
         if match.teamB.ext_id == match.winner.ext_id:
             for ubet in team_b_ubets:
-                win_amount = ubet.amount + (team_a_total * ubet.amount/team_b_total)
+                win_amount = ubet.amount + (team_a_total * ubet.amount / team_b_total)
                 sbet = SettledBet.objects.create(bet=office_bet, user=ubet.user, amount=win_amount)
                 user_profile = PayableProfile.objects.get(user=ubet.user)
                 user_profile.coins = user_profile.coins + sbet.amount
