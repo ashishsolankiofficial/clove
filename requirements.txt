@@ -7,3 +7,4 @@ sqlparse==0.4.3
 psycopg2-binary==2.9.5
 django-widget-tweaks==1.4.12
 ipython==8.4.0
+gunicorn==20.1.0

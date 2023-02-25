@@ -1,6 +1,5 @@
 from django.urls import path
 import playable.views as view
-from playable.views import UpcommingView, MatchView, YourBetsView
 
 urlpatterns = [
     path('add_tournament/', view.add_tournament, name='add_tournament'),
@@ -13,8 +12,4 @@ urlpatterns = [
     path('list_inactive_match/<str:t_id>/', view.list_inactive_match, name='list_inactive_match'),
     path('choose_winner/<str:t_id>/<str:ext_id>/', view.choose_winner, name='choose_winner'),
     path('distribute_rewards/<str:t_id>/<str:ext_id>/', view.distribute_rewards, name='distribute_rewards'),
-
-    path('upcomming/', UpcommingView.as_view()),
-    path('match/<str:ext_id>', MatchView.as_view()),
-    path('your-bets/', YourBetsView.as_view())
 ]

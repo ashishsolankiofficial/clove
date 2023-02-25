@@ -71,7 +71,7 @@ class BetSerializer(serializers.ModelSerializer):
             user_profile = PayableProfile.objects.get(user=user)
             user_profile.coins = user_profile.coins - (ubet.amount - previous_bet_amount)
             user_profile.save()
-        except:
+        except UnsettledBet.DoesNotExist:
             ubet = UnsettledBet.objects.create(bet=instance, user=user, team=team, amount=self.context.get('request').data['placed_bets'][0]['amount'])
             user_profile = PayableProfile.objects.get(user=user)
             user_profile.coins = user_profile.coins - ubet.amount

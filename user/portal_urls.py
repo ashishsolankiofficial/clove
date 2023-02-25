@@ -1,6 +1,5 @@
 from django.urls import path
 import user.views as views
-from user.views import UserProfileView, ResetPassword
 
 urlpatterns = [
 
@@ -13,7 +12,4 @@ urlpatterns = [
     path('list_user/', views.list_user, name='list_user'),
     path('list_inactive_user/', views.list_inactive_user, name='list_inactive_user'),
 
-    path('reset-password/', ResetPassword.as_view()),
-
-    path('profile/<str:ext_id>/', UserProfileView.as_view())
 ]
