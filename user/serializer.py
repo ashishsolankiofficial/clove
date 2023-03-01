@@ -1,8 +1,8 @@
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework import serializers
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
 from user.models import User
-from payable.serializer import CoinSerializer
 
 
 class UserProfileSerializer(serializers.ModelSerializer):

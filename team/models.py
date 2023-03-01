@@ -1,6 +1,8 @@
 from django.db import models
-from util.models import Country, get_ext_id
+from util.models import get_ext_id
+
 from user.models import User
+from util.models import Country
 
 
 class Team(models.Model):
@@ -9,9 +11,7 @@ class Team(models.Model):
         ("N", "National"),
         ("C", "Club"),
     )
-    type = models.CharField(max_length=1,
-                            choices=TYPE_CHOICES,
-                            default="C")
+    type = models.CharField(max_length=1, choices=TYPE_CHOICES, default="C")
     ext_id = models.CharField(max_length=10)
     active = models.BooleanField(default=True)
     image_url = models.URLField(blank=True, null=True)

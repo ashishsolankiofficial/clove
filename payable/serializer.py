@@ -1,10 +1,12 @@
-from django.shortcuts import get_object_or_404
 from rest_framework import serializers
-from payable.models import PayableProfile, OfficeBet, UnsettledBet
+
+from django.shortcuts import get_object_or_404
+
+from team.models import Team
+from user.models import User
 from office.models import Office
 from playable.models import BilateralMatch
-from user.models import User
-from team.models import Team
+from payable.models import PayableProfile, OfficeBet, UnsettledBet
 
 
 class CoinSerializer(serializers.ModelSerializer):

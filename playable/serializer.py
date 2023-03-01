@@ -1,9 +1,10 @@
 from rest_framework import serializers
+
+from user.models import User
+from team.serializer import TeamSerializer
 from playable.models import Sport, BilateralMatch
 from payable.models import UnsettledBet, OfficeBet
 from payable.serializer import UnsettledBetSerializer
-from team.serializer import TeamSerializer
-from user.models import User
 
 
 class MatchSerializer(serializers.ModelSerializer):

@@ -1,9 +1,11 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
 from user.models import User
-from office.models import Task, Office
+from office.models import Task
 from office.forms import TaskForm
 from office.serializer import TaskSerializer
 from payable.models import PayableProfile
