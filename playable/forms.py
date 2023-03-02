@@ -1,9 +1,8 @@
-import pytz
-from django.utils import timezone
 from django import forms
 from django.core.exceptions import ValidationError
-from playable.models import Tournament, BilateralMatch
+
 from team.models import Team
+from playable.models import Tournament, BilateralMatch
 
 
 class TournamentForm(forms.ModelForm):
@@ -40,5 +39,5 @@ class BilateralMatchWinnerForm(forms.ModelForm):
         fields = ['winner', ]
 
     def __init__(self, teams, *args, **kwargs):
-        super(BilateralMatchWinnerForm, self).__init__(*args, **kwargs)  # populates the post
+        super(BilateralMatchWinnerForm, self).__init__(*args, **kwargs)
         self.fields['winner'].queryset = Team.objects.filter(ext_id__in=teams)

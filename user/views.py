@@ -1,16 +1,18 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+
+from django.contrib import messages
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from user.forms import AdminForm, UserForm
+
 from user.models import User
+from user.forms import AdminForm, UserForm
 from user.serializer import UserProfileSerializer
 from payable.models import PayableProfile
 from office.models import Office
-from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth import authenticate, login, logout
-from django.contrib import messages
 
 
 class UserProfileView(APIView):

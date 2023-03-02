@@ -1,7 +1,5 @@
-from django.db import models
 import random
-
-# Create your models here.
+from django.db import models
 
 
 class Country(models.Model):

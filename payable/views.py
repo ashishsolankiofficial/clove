@@ -3,10 +3,9 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
+
 from django.shortcuts import get_object_or_404
 
-from playable.models import BilateralMatch
-from office.models import Office
 from user.models import User
 from payable.models import PayableProfile, OfficeBet, UnsettledBet
 from payable.serializer import CoinSerializer, BetSerializer, UnsettledBetSerializer

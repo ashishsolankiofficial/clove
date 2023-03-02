@@ -1,9 +1,10 @@
 from rest_framework import serializers
+
+from user.models import User
+from team.serializer import TeamSerializer
 from playable.models import Sport, BilateralMatch
 from payable.models import UnsettledBet, OfficeBet
 from payable.serializer import UnsettledBetSerializer
-from team.serializer import TeamSerializer
-from user.models import User
 
 
 class MatchSerializer(serializers.ModelSerializer):
@@ -35,10 +36,11 @@ class UpcommingSerializer(serializers.ModelSerializer):
 
     def get_match(self, obj):
         unsettled_office_bet_ids = OfficeBet.objects.filter(settled=False, office=User.objects.get(ext_id=self.context.get("request").user.ext_id).office).values_list('ext_id', flat=True)
-        match_with_unsettled_bets = BilateralMatch.objects.filter(tournament__sport__ext_id=obj.ext_id, active=True, bet__ext_id__in=unsettled_office_bet_ids).order_by('match_start_time')
-        match_with_no_bet = BilateralMatch.objects.filter(tournament__sport__ext_id=obj.ext_id, active=True, bet__isnull=True)
+        match_with_unsettled_bets = BilateralMatch.objects.filter(tournament__sport__ext_id=obj.ext_id, active=True, bet__ext_id__in=unsettled_office_bet_ids)
+        match_with_no_bet = BilateralMatch.objects.filter(tournament__sport__ext_id=obj.ext_id, active=True).exclude(
+            bet__office=User.objects.get(ext_id=self.context.get("request").user.ext_id).office)
         matches = match_with_unsettled_bets | match_with_no_bet
-        return MatchSerializer(matches, many=True, context=self.context).data
+        return MatchSerializer(matches.order_by('match_start_time'), many=True, context=self.context).data
 
 
 class YourBetSerializer(serializers.ModelSerializer):

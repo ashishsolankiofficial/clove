@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from team.forms import TeamForm
-from team.models import Team
+
 from user.models import User
+from team.models import Team
+from team.forms import TeamForm
 
 
 def add_team(request):

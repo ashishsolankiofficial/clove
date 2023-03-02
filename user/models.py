@@ -1,11 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+
 from util.models import get_ext_id
-from office.models import Office
 from .manager import UserManager
 
-
-# Create your models here.
+from office.models import Office
 
 
 class User(AbstractUser):
@@ -16,10 +15,10 @@ class User(AbstractUser):
     office = models.ForeignKey(Office, related_name='employees', on_delete=models.CASCADE, null=True)
     office_admin = models.BooleanField(default=False)
     super_admin = models.BooleanField(default=False)
-    username = None
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    username = None
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name', 'display_name']
 

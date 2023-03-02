@@ -1,12 +1,11 @@
 from django import forms
-from user.models import User
 
-# Create the form class.
+from user.models import User
 
 
 class AdminForm(forms.ModelForm):
-    first_name = forms.CharField(max_length=50)  # Required
-    last_name = forms.CharField(max_length=50)  # Required
+    first_name = forms.CharField(max_length=50)
+    last_name = forms.CharField(max_length=50)
 
     class Meta:
         model = User
